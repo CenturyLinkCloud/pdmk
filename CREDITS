@@ -1,0 +1,76 @@
+Copyright (c) 2014-2015 CenturyLink, Inc.
+
+
+The Plastic Data Modeling Kit [pdmk] is a 100% JavaScript data modeling toolkit
+which leverages many robust JavaScript frameworks and libraries to function.
+This file contains a list of these libraries and official project contributors.
+Without the support of these libraries and individuals this project [pdmk]
+would not be possible.
+
+
+
+Support Frameworks and Libraries -
+
+  Plastic -
+
+    jQuery - http://jquery.com/ [MIT License]
+    jQuery UI - http://jqueryui.com/ [MIT License]
+    jQuery Context Menu - http://medialize.github.com/jQuery-contextMenu/ [MIT License]
+    jQuery DynaTree - http://dynatree.googlecode.com/ [MIT License]
+    jQuery DataTables - http://www.datatables.net/ [BSD License]
+    jQuery Sparkline - http://omnipotent.net/jquery.sparkline/ [New BSD License] 
+    QUnit - http://qunitjs.com/ [MIT License]
+    BigInt - http://leemon.com/crypto/BigInt.html [Public Domain]
+
+  Not-Plastic -
+
+    google-code-prettify - https://code.google.com/p/google-code-prettify/ [Apache License 2.0]
+
+
+Core Software Architecture and Plastic Contributors [pdmk]
+                                 ___  
+            _______             /  /\                        ___
+           /  ___  \        ___/  /  \__                    /  /\_________
+          /  /\  )  )__    /  /  /   /__\                  /  /  \        \
+         /  /  \/  / \_\__/__/  /   /  /\\_  ____         /  /  _/__      /\
+        /  /___/  /  /  ____   /   /  ___  \/    \       /  / _/  _/\    /  \
+       /  _______/  /  /\  /  /   /  /\  \___/)  /\___  /  /_/  _/\\ \  /    \
+      /  /\      \ /  /  \/  /   /  /  \__\__/  /  \  \/      _/\\ \\/ /      \
+     /  /  \______/   (__/  /   /  /   /    /  /   / //  _   /\\ \\/  /       /
+    /  /   /      (________/   /__/   /    /__/   / //  / \  \ \\/   /       /
+   /__/   /       /\       \  /\  \  /     \  \  / //__/   \__\/    /       /
+   \  \  /       / /\_______\/ /\__\/       \__\/ /  \ \  / \  \   /       /
+  / \__\/       / /           /__________________/  / \_\/   \__\ /       /
+ /             / \___________/ \=                \ /____________ /       /
+ \____________/   \=         \  \==               \ \=           \      /
+  \=          \    \==        \  \===              \ \==          \    /
+   \==         \    \===       \  \====_____________\/\===         \  /
+    \===        \  / \====______\/                     \====________\/
+     \====_______\/
+
+  Concept -
+
+    Chief Software Architect - John Woodworth <john.woodworth@centurylink.com>
+
+  Design -
+
+    Chief Software Architect - John Woodworth <john.woodworth@centurylink.com>
+    Software Consultant - Dean Ballew <dean.ballew@centurylink.com>
+    Graphical Consultant - Shashwath Bindinganaveli Raghavan
+
+  Development -
+
+    Lead Software Developer - John Woodworth <john.woodworth@centurylink.com>
+    Playbook Consultant - Dean Ballew <dean.ballew@centurylink.com>
+  
+  Testing -
+
+    Chief Test Architect - Dean Ballew <dean.ballew@centurylink.com>
+    Test Architect - Shashwath Bindinganaveli Raghavan
+
+  Official [pdmk] Code Maintainers -
+
+    Chief Software Architect - John Woodworth <john.woodworth@centurylink.com>
+    Playbook Consultant - Dean Ballew <dean.ballew@centurylink.com>
+
+
