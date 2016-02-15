@@ -1243,6 +1243,9 @@
                                                 if (JSON.stringify(thisDirtyList[cntDirty][thisDirty][0]) === undefined) {
                                                     _PlasticBug('UNDEFINED: ' + thisDirty + ' => ' + thisDirtyList[cntDirty][thisDirty][0], 2);
                                                 } else {
+                                                    var dateFormat = (_PlasticRuntime.datastore[thisDatastore]) //->
+                                                        ? _PlasticRuntime.datastore[thisDatastore].option('dateFormat') //->
+                                                        : 'yy-mm-dd';
                                                     var thisDirtyObj = thisDirtyList[cntDirty][thisDirty][0];
                                                     var thisCacheObj = thisDirtyList[cntDirty][thisDirty][1];
                                                     for (var thisItem in thisDirtyObj) {
@@ -1261,8 +1264,12 @@
                                                             for (var thisChange in thisDirtyObj[thisItem].attributes) {
                                                                 var thisLabel = ((prettyNames) && (prettyNames[thisChange])) //->
                                                                     ? prettyNames[thisChange] : thisChange;
-                                                                var thisBefore = thisCacheObj[thisItem].attributes[thisChange];
-                                                                var thisAfter = thisDirtyObj[thisItem].attributes[thisChange];
+                                                                var thisBefore = (thisDirtyObj[thisItem].attributes[thisChange] instanceof Date) //->
+                                                                    ? $.datepicker.formatDate(dateFormat, thisCacheObj[thisItem].attributes[thisChange]) //->
+                                                                    : thisCacheObj[thisItem].attributes[thisChange];
+                                                                var thisAfter = (thisDirtyObj[thisItem].attributes[thisChange] instanceof Date) //->
+                                                                    ? $.datepicker.formatDate(dateFormat, thisDirtyObj[thisItem].attributes[thisChange]) //->
+                                                                    : thisDirtyObj[thisItem].attributes[thisChange];
                                                                 if (thisAfter instanceof Object) {
                                                                     if (thisBefore === undefined) { thisBefore = {}; };
                                                                     for (var groupEl in thisAfter) {

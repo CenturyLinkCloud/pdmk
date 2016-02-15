@@ -63,21 +63,24 @@ Plastic.RegisterDatastore({
                         'Welcome to the Plastic Data Modeling Kit [pdmk] Manual. This manual covers ' + //->
                         'the [pdmk] toolkit, its components and provides <span activate="examples">interactive ' + //->
                         'examples</span> by way of JSFiddle.<br><br>' + //->
+                        'The [pdmk] toolkit is written in entirely 100% JavaScript and requires zero html ' + //->
+                        'coding to use. All graphical components and data-flow elements are provided in an ' + //->
+                        'easy to follow JSON based configuration file (or <span activate="playbook">Playbook</span>).<br><br>' + //->
                         'Click <span activate="introduction">next</span> to find out more about [pdmk].<br><br>' + //->
                         '<div style="position:relative;">' + //->
                         '<img src="images/plastic-information.png" ' + //->
                              'style="position:absolute;width:30px;height:30px;top:-5px;right:-5px;">' + //->
-                        '<pre style="border:solid #eeeeff;padding:0px 15px;overflow:auto;">\n' + //->
+                        '<pre style="border:solid #eeeeff;padding:0px 15px;overflow:auto;margin-left:80px;">\n' + //->
                         'Plastic:\n' + //->
                         '  - formative, creative\n' + //->
                         '  - capable of being molded or modeled plastic clay\n' + //->
                         '  - capable of adapting to varying conditions : pliable\n' + //->
                         '  - sculptural\n' + //->
-                        '  - capable of being deformed continuously and permanently in any direction ' + //->
-                             'without rupture\n\n' + //->
+                        '  - capable of being deformed continuously and permanently in any direction\n' + //->
+                        '    without rupture\n\n' + //->
                         'Plastic Data:\n' + //->
-                        '  - data which can easily be formed, molded, pliably adapted and manipulated ' + //->
-                             'to varying conditions\n' + //->
+                        '  - data which can easily be formed, molded, pliably adapted and manipulated\n' + //->
+                        '    to varying conditions\n' + //->
                         '</pre>\n' + //-> 
                         '</div>\n' + //-> 
                         'Select from the help sections on the left for more information and <span activate="examples">examples</span>.' + //->
@@ -1337,14 +1340,28 @@ Plastic.RegisterDatastore({
                                     rowObject.lastChild = children[children.length -1];
                                 }
                             }
-                        } else {
-                            rowObject = datastore.getGenericRowObject(uuid(),null,$.extend({}, attributes, {
+                        } else { // Prime The Datastore
+                            var parentKey, children = [];
+                            attributes = datastore.option('rowDefault');
+                            rowObject = datastore.getGenericRowObject(null, uuid(), $.extend({}, attributes, {
                                 type: 'root', isolated: null, title: datastore.option('rootTitle')
                                ,qualifiedTitle: datastore.option('rootTitle'), tooltip: datastore.option('rootTitle')
                                ,children: []
                             }), { merge: true });
                             localStorage['pdmkds:' + datastore.name + ':root'] = rowObject.key;
                             localStorage['pdmkds:' + datastore.name + '_' + rowObject.key] = JSON.stringify(rowObject);
+                            parentKey = rowObject.key;
+                            // Create direct children of Root '/'
+                            $.each(['bin', 'dev', 'home', 'tmp', 'var'], function(index, name){
+                                var cRowObject = datastore.getGenericRowObject(parentKey, uuid(), $.extend({}, attributes, {
+                                    type: 'folder', isolated: null, title: name
+                                   ,qualifiedTitle: '/' + name, tooltip: '/' + name
+                                   ,children: null
+                                }), { merge: true });
+                                localStorage['pdmkds:' + datastore.name + '_' + cRowObject.key] = JSON.stringify(cRowObject);
+                                children[children.length] = cRowObject.key;
+                            });
+                            localStorage['pdmkds:' + datastore.name + ':children_' + parentKey] = JSON.stringify(children);
                         }
                         retFunction([{ "status" : "creating", "id" : datastore.nextSequence() }, rowObject], fopts);
                     } else {
@@ -1401,7 +1418,10 @@ Plastic.RegisterDatastore({
                     var thisParentKey = thisRowObjects[cntRow].parentKey;
                     if (thisRowObjects[cntRow].deleted) {
                         // NOTE: No Orphan-Checks are performed here
-                        if ((thisParentKey !== null) && ('pdmkds:' + datastore.name + ':children_' + thisParentKey in localStorage)) {
+                        if (thisParentKey === null) {
+                            localStorage.removeItem('pdmkds:' + datastore.name + ':root');
+                            localStorage.removeItem('pdmkds:' + datastore.name + '_' + thisRowObjects[cntRow].key);
+                        } else if ('pdmkds:' + datastore.name + ':children_' + thisParentKey in localStorage) {
                             var newSiblings = [];
                             var siblings = JSON.parse(localStorage['pdmkds:' + datastore.name + ':children_' + thisParentKey]);
                             for (var thisSibling = 0; thisSibling < siblings.length; thisSibling ++) {

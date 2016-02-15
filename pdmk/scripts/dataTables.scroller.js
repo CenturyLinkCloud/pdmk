@@ -1,1 +1,0 @@
-dataTables.scroller.full.js

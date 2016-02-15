@@ -402,7 +402,7 @@ function PlasticDatastore(name, fopts) {
         }
     };
     this.nextSequence = function _PlasticDatastore_nextSequence() { return ++sequence; };
-    this.getGenericRowObject = function _PlasticDatastore_getGenericRowObject(key, parentkey, defaults, fopts) {
+    this.getGenericRowObject = function _PlasticDatastore_getGenericRowObject(parentkey, key, defaults, fopts) {
         var date = new Date();
         var thisParentkey = (parentkey) ? parentkey : null;
         var thisName = (this.name) ? this.name : self.name;
@@ -492,7 +492,7 @@ function PlasticDatastore(name, fopts) {
                                 if ((parentkey === null) && (rootNodeKey === null)) { rootNodeKey = thisKey; };
                                 for (var cntRows = 1; cntRows < rowObjects.length; cntRows++) {
                                     self.cacheRow(rowObjects[cntRows].key, $.extend( //->
-                                        self.getGenericRowObject(rowObjects[cntRows].key, parentkey), //->
+                                        self.getGenericRowObject(parentkey, rowObjects[cntRows].key), //->
                                         rowObjects[cntRows]), fopts);
                                 }
                                 _PlasticBug('Calling retFunction', 4, 'call');
@@ -542,7 +542,7 @@ function PlasticDatastore(name, fopts) {
         var pCache = this.readCache(parentkey, fopts);
         var pQualifiedTitle = (pCache.qualifiedTitle === opts.delimiter) //->
             ? '' : pCache.qualifiedTitle;
-        var baseObject = this.getGenericRowObject(key, parentkey, $.extend({}, {
+        var baseObject = this.getGenericRowObject(parentkey, key, $.extend({}, {
             'title' : '(New)'
            ,qualifiedTitle: (parentkey === null) //->
                 ? (opts.includeRoot === false) //->
