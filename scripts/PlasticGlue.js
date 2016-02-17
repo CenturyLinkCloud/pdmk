@@ -1218,14 +1218,34 @@
                             if (!($(this).hasClass('plastic-system-cart-empty'))) {
                                 _PlasticRuntime.system.cart.list = $('<div class="plastic-system-cart-list" ">');
                                 $(_PlasticRuntime.root).prepend(_PlasticRuntime.system.cart.list);
+                                $(_PlasticRuntime.system.cart.list).on('click', '.plastic-actionable', function(e){
+                                    if ($(this).attr('plastic-action') === 'commit') {
+                                        var dsname = $(this).closest('.plastic-commitgroup-wrap') //->
+                                            .find('.plastic-commitgroup-datastore').data('plastic-datastore');
+                                        var datastore = (dsname) ? _PlasticRuntime.datastore[dsname] : null;
+                                        var rowObjects = [];
+                                        $(this).closest('.plastic-field-group').find('.plastic-commitgroup-item').each(function(){
+                                            rowObjects[rowObjects.length] = datastore.readCache($(this).data('plastic-key'));
+                                        });
+                                        _PlasticRuntime.system.commitpane.show();
+                                        var thisRetFunction = function(){ // Sweep Through Views And Update??(FindMe!!)
+                                            _PlasticRuntime.system.commitpane.hide();
+                                            $(_PlasticRuntime.system.cart.list).remove();
+                                        };
+                                        datastore.commitRow([ { "status" : "commit", "id" : datastore.nextSequence() }, //->
+                                            rowObjects ], thisRetFunction, {});
+                                    }
+                                });
                                 var cntItemGroup = 0;
-                                var testCART = '<button onClick="$(this).parent().remove();">Del</button>';
+                                var testCART = '<button onClick="$(this).parent().remove();">Close</button>';
                                 testCART += '<button class="plastic-actionable" plastic-action="commitall">Save All</button>';
                                 for (var thisDatastore in _PlasticRuntime.datastore) {
                                     if (_PlasticRuntime.datastore[thisDatastore].dirtyCount()) {
                                         var prettyNames = _PlasticRuntime.datastore[thisDatastore].option('prettyNames');
                                         testCART += '<div class="plastic-commitgroup-wrap">';
-                                        testCART += '<label class="plastic-commitgroup-datastore"><b>Item Category:</b> ' + thisDatastore + '</label>';
+                                        testCART += '<label class="plastic-commitgroup-datastore" ' + //->
+                                            'data-plastic-datastore="' + thisDatastore  + '">' + //->
+                                            '<b>Item Category:</b> ' + thisDatastore + '</label>';
                                         var thisDirtyList = _PlasticRuntime.datastore[thisDatastore].dirtyList();
                                         for (var cntDirty = 0; cntDirty < thisDirtyList.length; cntDirty ++) {
                                             cntItemGroup ++;
@@ -1253,7 +1273,8 @@
                                                             ? thisDirtyObj[thisItem].qualifiedTitle : thisCacheObj[thisItem].qualifiedTitle;
                                                         if (thisDirtyObj[thisItem].deleted) {
                                                             testCART += '<div class="plastic-commitgroup-title">' + //->
-                                                                'Deleted Item: <span class="plastic-deleted">' + title + '</span></div>';
+                                                                'Deleted Item: <span class="plastic-commitgroup-item plastic-deleted" ' + //->
+                                                                'data-plastic-key="' + thisItem + '">' + title + '</span></div>';
                                                         } else {
                                                             if ((thisCacheObj[thisItem].isolated) || (thisDirtyObj[thisItem].isolated)) {
                                                                 testCART += '<div class="plastic-commitgroup-title">New Item: ' + title + '</div>';
@@ -1273,13 +1294,13 @@
                                                                 if (thisAfter instanceof Object) {
                                                                     if (thisBefore === undefined) { thisBefore = {}; };
                                                                     for (var groupEl in thisAfter) {
-                                                                        testCART += '<tr class="plastic-commitgroup-item">' + //->
+                                                                        testCART += '<tr class="plastic-commitgroup-item" data-plastic-key="' + thisItem + '">' + //->
                                                                             '<td class="plastic-commitgroup-item-name">' + thisLabel + '[' + groupEl  + ']:</td>' + //->
                                                                             '<td class="plastic-commitgroup-item-before">' + thisBefore[groupEl] + '</td>' + //->
                                                                             '<td class="plastic-commitgroup-item-after">' + thisAfter[groupEl] + '</td></tr>';
                                                                     }
                                                                 } else {
-                                                                    testCART += '<tr class="plastic-commitgroup-item">' + //->
+                                                                    testCART += '<tr class="plastic-commitgroup-item" data-plastic-key="' + thisItem + '">' + //->
                                                                         '<td class="plastic-commitgroup-item-name">' + thisLabel + ':</td>' + //->
                                                                         '<td class="plastic-commitgroup-item-before">' + thisBefore + '</td>' + //->
                                                                         '<td class="plastic-commitgroup-item-after">' + thisAfter + '</td></tr>';
@@ -1291,7 +1312,7 @@
                                                                         ? prettyNames[thisChange] : thisChange;
                                                                     var thisBefore = thisCacheObj[thisItem][thisChange];
                                                                     var thisAfter = thisDirtyObj[thisItem][thisChange];
-                                                                    testCART += '<tr class="plastic-commitgroup-item">' + //->
+                                                                    testCART += '<tr class="plastic-commitgroup-item" data-plastic-key="' + thisItem + '">' + //->
                                                                         '<td class="plastic-commitgroup-item-name">' + thisLabel + ':</td>' + //->
                                                                         '<td class="plastic-commitgroup-item-before">' + thisBefore + '</td>' + //->
                                                                         '<td class="plastic-commitgroup-item-after">' + thisAfter + '</td></tr>';
@@ -1308,7 +1329,7 @@
                                     }
                                 }
                                 _PlasticRuntime.system.cart.list.html(testCART);
-                                $('.plastic-commitgroup-wrap button').button();
+                                $('.plastic-commitgroup-wrap button, .plastic-system-cart-list>button').button();
                             }
                         });
                         // Add default SysFeedback Component if not defined in Playbook
