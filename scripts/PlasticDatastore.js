@@ -8,7 +8,7 @@
 /                                   Datastore Object Support
 / Author: John R B Woodworth <John.Woodworth@CenturyLink.com>
 /
-/ Support Contact: funwithplastic@ctl.io
+/ Support Contact: plastic@centurylink.com
 /
 / Created: 04 January, 2014
 / Last Updated: 10 February, 2016
@@ -103,17 +103,17 @@ function PlasticDatastore(name, fopts) {
        ,includeRoot: false
     };
     var views = { "default" : [] }; // Bound framework views
-    this.option = function _PlasticDatastore_option(name, value) {
+    this.option = function _PlasticDatastore_option(name, value, fopts) {
         var retVal;
         if (typeof (name) === 'string') {
-            if (arguments.length === 1) {
+            if (value === undefined) {
                 switch (name) {
                     case "securityContext":
                         retVal = (opts[name] !== undefined) ? JSON.parse(opts[name]) : undefined;
                         break;
                     case "rowDefault":
                         if (opts[name] !== undefined) {
-                            retVal = (typeof(opts[name]) === 'function') ? opts[name].call(self) : opts[name];
+                            retVal = (typeof(opts[name]) === 'function') ? opts[name].call(self, fopts) : opts[name];
                         } else {
                             retVal = undefined;
                         }
@@ -158,7 +158,8 @@ function PlasticDatastore(name, fopts) {
                                     };
                                     cache[rootNodeKey] = $.extend({}, baseRowObject, //->
                                         {qualifiedTitle: opts.rootRowObject.title}, opts.rootRowObject, {
-                                        attributes: $.extend({}, self.option('rowDefault'), opts.rootRowObject.attributes)
+                                        attributes: $.extend({}, self.option('rowDefault', undefined, opts.rootRowObject.attributes), //->
+                                            opts.rootRowObject.attributes)
                                     });
                                 } else { // Generate rootRowObject
                                     cache[rootNodeKey] = { //->
@@ -190,7 +191,7 @@ function PlasticDatastore(name, fopts) {
                                        ,hidden: null //->
                                        ,isolated: null //->
                                        ,sortIndex: {} //->
-                                       ,attributes: $.extend({}, self.option('rowDefault')) //->
+                                       ,attributes: $.extend({}, self.option('rowDefault', undefined, fopts)) //->
                                     };
                                 }
                                 var procRow = function(thisData, parentKey) {
@@ -232,7 +233,7 @@ function PlasticDatastore(name, fopts) {
                                                ,hidden: null //->
                                                ,isolated: null //->
                                                ,sortIndex: {} //->
-                                               ,attributes: $.extend({}, self.option('rowDefault')) //->
+                                               ,attributes: $.extend({}, self.option('rowDefault', undefined, thisData[thisElem].attributes)) //->
                                             };
                                             if (typeof(thisData[thisElem]) === 'object') {
                                                 var attributes = thisData[thisElem].attributes;
@@ -560,7 +561,7 @@ function PlasticDatastore(name, fopts) {
                 : (opts.anchor === 'left') //->
                     ? pQualifiedTitle + opts.delimiter + '(New)' //->
                     : '(New)' + opts.delimiter + pQualifiedTitle //->
-        }, datastore.option('rowDefault')));
+        }, datastore.option('rowDefault', undefined, fopts)));
         //var baseObject = { "disabled" : false, "hidden" : false, "type" : "folder", //->
         //    "key" : key, "parentKey" : parentkey, "title" : undefined, "qualifiedTitle" : undefined, "tooltip" : undefined, //->
         //    "dirty" : null, "error" : null, "deleted" : null, "selected": null, "isolated" : true, "children" : null, //->

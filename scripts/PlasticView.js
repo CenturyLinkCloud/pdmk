@@ -8,7 +8,7 @@
 /                              View Component Support
 / Author: John R B Woodworth <John.Woodworth@CenturyLink.com>
 /
-/ Support Contact: funwithplastic@ctl.io
+/ Support Contact: plastic@centurylink.com
 /
 / Created: 04 January, 2014
 / Last Updated: 10 February, 2016
@@ -200,27 +200,28 @@
                             }
                         }
                         thisTree.enableUpdate(prevEnable);
-                        $('.plastic-treenode-summary.plastic-unpainted:visible').each(function(){
-                        ////$('.plastic-treenode-summary:visible').each(function(){
-                            ////$(this).sparkline('html', $(this).data('sparkopts')).removeClass('plastic-unpainted');
-                            var node = $(this).data('node');
-                            var context = this;
-                            $(context).removeClass('plastic-unpainted');
-                            setTimeout(function(){
-                                $(context).sparkline($(node).data('sparkvalues'), //->
-                                    $(node).data('sparkopts'));
-                                    ///$(node).data('sparkopts')).removeClass('plastic-unpainted');
-                                var canvas = $('.plastic-treenode-summary', node.span).children('canvas');
-                        ///        var shapegroup = $(node.li).find('group:first').parent().children(':first');
-                                if (canvas.length) {
-                                    $(node).data('canvas', canvas);
-                        ///        } else if (shapegroup.length) {
-                        ///            $(node).data('shapegroup', shapegroup);
-                                }
-                            ///}, 1);
-                            }, Math.floor((Math.random() * 500) + 501));
-                            ////$(this).sparkline($(node).data('sparkvalues'), $(node).data('sparkopts')).removeClass('plastic-unpainted');
-                        });
+                    //    $('.plastic-treenode-summary.plastic-unpainted:visible').each(function(){
+                    //    ////$('.plastic-treenode-summary:visible').each(function(){
+                    //        ////$(this).sparkline('html', $(this).data('sparkopts')).removeClass('plastic-unpainted');
+                    //        var node = $(this).data('node');
+                    //        var context = this;
+                    //        $(context).removeClass('plastic-unpainted');
+                    //        setTimeout(function(){
+                    //            $(context).sparkline($(node).data('sparkvalues'), //->
+                    //                $(node).data('sparkopts'));
+                    //                ///$(node).data('sparkopts')).removeClass('plastic-unpainted');
+                    //            var canvas = $('.plastic-treenode-summary', node.span).children('canvas');
+                    //    ///        var shapegroup = $(node.li).find('group:first').parent().children(':first');
+                    //            if (canvas.length) {
+                    //                $(node).data('canvas', canvas);
+                    //    ///        } else if (shapegroup.length) {
+                    //    ///            $(node).data('shapegroup', shapegroup);
+                    //            }
+                    //        ///}, 1);
+                    //        }, Math.floor((Math.random() * 500) + 501));
+                    //        ////$(this).sparkline($(node).data('sparkvalues'), $(node).data('sparkopts')).removeClass('plastic-unpainted');
+                    //    });
+                        self.trigger('expanded.plastic');
                         if (!(view[name].find('.dynatree-loading').length)) { // No More Loading
                             $('a.plastic-stack-status[href=#' + name + ']').removeClass('plastic-component-loading');
                         }
@@ -303,6 +304,11 @@
             tree: function _plasticview__make_tree(fopts){
                 var thisId = $(this).attr('id');
                 var expandLevel = ((fopts) && (fopts.forceRootExpanded)) ? 2 : null;
+                var dsname = ((fopts) && (fopts.datastore)) ? fopts.datastore : null;
+                var namespace = ((fopts) && (fopts.namespace)) ? fopts.namespace : 'default';
+                var datastore = ((dsname) && (_PlasticRuntime.datastore[dsname])) ? _PlasticRuntime.datastore[dsname] : null;
+                var prettyNames = ((fopts) && (datastore)) //->
+                    ? $.extend({}, datastore.option('prettyNames'), fopts.prettyNames) : {};
                 $(this).resize(function (e){
                     e.stopPropagation(); // Resize needs to bubble opposite normal flow for efficiency in the browser
                     _PlasticBug('resize(); called:', 4, 'function');
@@ -342,7 +348,7 @@
                         $(this).parent().children(':first').trigger('click');
                     }
                 });
-                $(this).on('activated.plastic', function(){
+                $(this).on('activated.plastic expanded.plastic', function(){
                     ////$('.plastic-treenode-summary:visible').each(function(){
                     $('.plastic-treenode-summary.plastic-unpainted:visible').each(function(){
                         var node = $(this).data('node');
@@ -351,7 +357,14 @@
                         setTimeout(function(){
                             $(context).sparkline($(node).data('sparkvalues'), //->
                                 $(node).data('sparkopts')).removeClass('plastic-unpainted');
-                        }, Math.floor((Math.random() * 1500) + 501));
+                                var canvas = $('.plastic-treenode-summary', node.span).children('canvas');
+                        ///        var shapegroup = $(node.li).find('group:first').parent().children(':first');
+                                if (canvas.length) {
+                                    $(node).data('canvas', canvas);
+                        ///        } else if (shapegroup.length) {
+                        ///            $(node).data('shapegroup', shapegroup);
+                                }
+                        }, Math.floor((Math.random() * 500) + 501));
                     });
                 });
                 $(this).on('rowactivate.plastic', function(e, xtra){
@@ -367,7 +380,9 @@
                    ,clickFolderMode: 1
                    ,minExpandLevel: expandLevel
                    ,onExpand: function(flag, node) {
-                        if ((self[0].plasticopts.resetOnCollapse) && (!(flag))) {
+                        if (flag) {
+                            self.trigger('expanded.plastic');
+                        } else if (self[0].plasticopts.resetOnCollapse) {
                             node.removeChildren();
                         }
                     }
@@ -427,9 +442,15 @@
                                 };
                                 var cntValue = 0, values = [];
                                 for (var thisSumAttr in fopts.summary.map) {
-                                    for (var thisSumAttrName in fopts.summary.map[thisSumAttr]) {
-                                        tooltipValueLookups.names[thisSumAttrName] = fopts.summary.map[thisSumAttr][thisSumAttrName];
-                                        sliceColors[cntValue] = thisSumAttrName;
+                                    if (typeof (fopts.summary.map[thisSumAttr]) === 'string') {
+                                        tooltipValueLookups.names[fopts.summary.map[thisSumAttr]] = (prettyNames[thisSumAttr]) //->
+                                            ? prettyNames[thisSumAttr] : thisSumAttr;
+                                        sliceColors[cntValue] = fopts.summary.map[thisSumAttr];
+                                    } else {
+                                        for (var thisSumAttrName in fopts.summary.map[thisSumAttr]) {
+                                            tooltipValueLookups.names[thisSumAttrName] = fopts.summary.map[thisSumAttr][thisSumAttrName];
+                                            sliceColors[cntValue] = thisSumAttrName;
+                                        }
                                     }
                                     values[cntValue] = node.data.rowObject.attributes[thisSumAttr];
                                     cntValue ++;
@@ -472,9 +493,13 @@
                                 var shapegroup = $(node).data('shapegroup');
                                 $('.dynatree-icon', $(node.span)).after(thisStatus);
                                 if (canvas) {
-                                    $(thisStatus).append(canvas);
+                                    if ($('canvas', thisStatus).length === 0) {
+                                        $(thisStatus).append(canvas);
+                                    }
                                 } else if (shapegroup) {
-                                    $(node.span).append(shapegroup);
+                                    if ($('shapegroup', thisStatus).length === 0) {
+                                        $(node.span).append(shapegroup);
+                                    }
                                 } else {
                                     thisStatus.addClass('plastic-unpainted');
                                 }

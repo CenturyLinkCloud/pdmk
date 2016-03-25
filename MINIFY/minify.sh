@@ -9,7 +9,7 @@ COPYRIGHT='
 / SEE LICENSE-MIT FOR LICENSE TERMS
 / SEE CREDITS FOR CONTRIBUTIONS AND CREDITS FOR THIS PROJECT
 / AUTHOR: John R B Woodworth <John.Woodworth@CenturyLink.com>
-/ SUPPORT CONTACT: funwithplastic@ctl.io
+/ SUPPORT CONTACT: plastic@centurylink.com
                                  ___  
             _______             /  /\                        ___
            /  ___  \        ___/  /  \__                    /  /\_________
@@ -107,6 +107,7 @@ echo "Minifying files:"
     | perl -ne 'print $_ unless ($_ =~ /(?<!_[.])_PlasticBug/)' \
     | perl -ne 'if ($.==1){print $ENV{COPYRIGHT}.$_;}else{print $_}' \
     | java -jar ../NOT-PLASTIC/yuicompressor-2.4.8.jar --type js -o pdmk-min.js
+#    | cat > pdmk-min.js
 
 (
     [ $OPT_ENQU -gt 0 ] && echo ../style/qunit.css

@@ -8,7 +8,7 @@
 /                                Widget Component Support
 / Author: John R B Woodworth <John.Woodworth@CenturyLink.com>
 /
-/ Support Contact: funwithplastic@ctl.io
+/ Support Contact: plastic@centurylink.com
 /
 / Created: 04 January, 2014
 / Last Updated: 10 February, 2016
@@ -1643,9 +1643,9 @@ return true;
                     this.rowObject = ((rowObjects) && (rowObjects.length > 1)) ? rowObjects[1] : undefined;
                     if ((fopts) && (rowObjects) && (rowObjects.length > 1)) {
                         if (fopts.defaultheight !== undefined) {
-                            $(self).dialog('option', 'height', fopts.defaultheight);
+                            $(self).dialog('option', 'height', parseInt(fopts.defaultheight));
                         }
-                        if (fopts.defaultwidth !== undefined) {
+                        if (fopts.defaultwidth !== undefined) { // Add Proportional "%" Calculation? (FindMe!!)
                             $(self).dialog('option', 'width', fopts.defaultwidth);
                         }
                         if (fopts.title !== undefined) {

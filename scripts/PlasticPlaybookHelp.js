@@ -9,7 +9,7 @@
 /                                      Help Demo Application
 / Author: John R B Woodworth <John.Woodworth@CenturyLink.com>
 /
-/ Support Contact: funwithplastic@ctl.io
+/ Support Contact: plastic@centurylink.com
 /
 / Created: 04 January, 2014
 / Last Updated: 10 February, 2016
@@ -63,6 +63,8 @@ $(document).ready(function(){
             ? $(this).closest('.ui-dialog').find('.ui-dialog-title').text().replace('[]', '[pdmk]') //->
             : $('div:eq(2)', this).text().replace('[]', '[pdmk]');
         if (newTitle.length) { $('title').text( newTitle ); };
+        // Initialize Flow Player Instances
+        $('div.pdmk-flowplayer').flowplayer().removeClass('pdmk-flowplayer');
     });
     $('body').on('show.plastic', '#LicenseDialog', function(){ // Envoke Logo Animation
         $('img[src="pdmkanim3o.gif"]', this).attr('src', 'about:blank').attr('src', 'pdmkanim3o.gif');

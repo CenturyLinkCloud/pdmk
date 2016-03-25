@@ -8,7 +8,7 @@
 /                               Stack Component Support
 / Author: John R B Woodworth <John.Woodworth@CenturyLink.com>
 /
-/ Support Contact: funwithplastic@ctl.io
+/ Support Contact: plastic@centurylink.com
 /
 / Created: 04 January, 2014
 / Last Updated: 10 February, 2016

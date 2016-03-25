@@ -9,7 +9,7 @@
 /                                       Help Demo Datastore
 / Author: John R B Woodworth <John.Woodworth@CenturyLink.com>
 /
-/ Support Contact: funwithplastic@ctl.io
+/ Support Contact: plastic@centurylink.com
 /
 / Created: 04 January, 2014
 / Last Updated: 10 February, 2016
@@ -56,21 +56,79 @@ Plastic.RegisterDatastore({
        ,rootRowObject: {
                 title: 'Help Topics [pdmk]', tooltip: 'Help Topics', type: 'root', key: 'help'
                ,attributes: {
-                    preinlinehelp: '<div>' + //->
-                        '<div style="font-size:18px;font-weight:bold;text-align:center;">' + //->
-                        'Help Topics <nobr>[<img src="images/pdmklogo_plainback01_sm.png" ' + //->
-                        'style="vertical-align:middle;" title="Plastic Data Modeling Kit">]</nobr></div><br>' + //->
-                        'Welcome to the Plastic Data Modeling Kit [pdmk] Manual. This manual covers ' + //->
-                        'the [pdmk] toolkit, its components and provides <span activate="examples">interactive ' + //->
-                        'examples</span> by way of JSFiddle.<br><br>' + //->
-                        'The [pdmk] toolkit is written in entirely 100% JavaScript and requires zero html ' + //->
-                        'coding to use. All graphical components and data-flow elements are provided in an ' + //->
-                        'easy to follow JSON based configuration file (or <span activate="playbook">Playbook</span>).<br><br>' + //->
-                        'Click <span activate="introduction">next</span> to find out more about [pdmk].<br><br>' + //->
+                    preinlinehelp: '<div style="font-style:normal;">' + //->
+                        '<div class="plastic-form-title" style="margin-top:0px;text-align:left;">' + //->
+                        'What is [pdmk] ?</div>' + //->
+                        '<p>The [pdmk] toolkit provides an easy way to build rich graphical applications backed ' + //->
+                        'by variety of data sources in a matter of days, not months. It is written in 100% native ' + //->
+                        'JavaScript and requires zero html coding or css knowledge to use.</p>' + //->
+                        '<p>All the other <span activate="credits">Amazing Libraries</span> [pdmk] needs to function ' + //->
+                        'are fully integrated making it even easier to <span activate="start">dive right in</span>.</p>' + //->
+                        '<div class="plastic-form-title" style="text-align:left;">' + //->
+                        'Who is [pdmk] for ?</div>' + //->
+                        '<p>The [pdmk] toolkit is designed for developers with all levels of experience. ' + //->
+                        'By introducing a number of new concepts even people with zero previous programming ' + //->
+                        'experience can have a working data driven graphical application in a matter of a few days.</p>' + //->
+                        '<div class="plastic-form-title" style="text-align:left;">' + //->
+                        'What types of applications can [pdmk] build ?</div>' + //->
+                        '<p>Any application where its primary function is working with data. At first glance this might seem ' + //->
+                        'to be a fairly short list but given some thought on the matter one can see this solution ' + //->
+                        'actually fits a <u>lot</u> of needs.</p>' + //->
+                        '<p>Some examples might be:<ul style="list-style-type:circle;">' + //->
+                        '<li style="font-weight:bold;">Travel Reservation</li>' + //->
+                        'Airline and hotel reservation systems typically interact with a lot of data. From availability and amenities ' + //->
+                        'to local restaurants and entertainment [pdmk] can track and allow users to quickly and easily interact with ' + //->
+                        'all these data sources.' + //->
+                        '<li style="font-weight:bold;">Customer Relationship Management (CRM)</li>' + //->
+                        'CRM software can be a salesperson\'s best tool. Building a CRM application can empower a small sales force ' + //->
+                        'to move quickly and stay focused on what is important for the business to be successful.' + //->
+                        '<li style="font-weight:bold;">Selling Goods or Services</li>' + //->
+                        'This is probably an obvious example. Presenting and allowing users to select and purchase goods and ' + //->
+                        'services can be done simply and effectively. Additionally, tracking products and local inventory ' + //->
+                        'can be integrated into the "user experience" for a more positive result.' + //->
+                        '<li style="font-weight:bold;">Journal or Blog Entries</li>' + //->
+                        'Yes [pdmk] can function as a content management system (CMS) tracking and presenting content in a ' + //->
+                        'consistent and uniform flow.' + //->
+                        '<li style="font-weight:bold;">Etc.</li>' + //->
+                        'As you can see, once the problem of building the application is shifted to one of data management ' + //->
+                        'a lot of opportunities open up.' + //->
+                        '</ul></p>' + //->
+                        '<div class="plastic-form-title" style="text-align:left;">' + //->
+                        'Why use [pdmk] instead of &lt;any other&gt; framework ?</div>' + //->
+                        '<p>The [pdmk] toolkit is <u>not</u> a <a href="https://en.wikipedia.org/wiki/Web_framework">' + //->
+                        'Web Application Framework</a> (WAF). While it shares many similarities ' + //->
+                        '(after all it is a framework for building web applications) it was designed ' + //->
+                        'from an entirely different perspective.</p>' + //->
+                        '<p>First, It strives to be a completely CODEFREE&trade; development tool. It accomplishes this ' + //->
+                        'through its <span activate="playbook">Playbook</span> which is a JSON based configuration ' + //->
+                        'file describing everything the application should do and how its data should be managed.</p>' + //->
+                        '<p>Second, it greatly simplifies common problems such as event handling. Events can be a ' + //->
+                        'very difficult concept for newcomers to grasp. The [pdmk] provides "action" assignments ' + //->
+                        'and takes care of all the little details (e.g. data validation) in an easy to visualize and ' + //->
+                        'generalized way.</p>' + //->
+                        '<p>Finally, our team is working to build a number of <span activate="datastore">Datastores</span> ' + //->
+                        'which can be used out-of-the-box and configured to use a variety of backing data sources.</p>' + //->
+                        '<p>Click <span activate="introduction">next</span> to find out more about [pdmk].</p>' + //->
+                        '<div class="plastic-form-title" style="text-align:left;">' + //->
+                        'Can you add &lt;any cool new&gt; feature ?</div>' + //->
+                        '<p>Please check out our <span activate="roadmap">Project Roadmap</span> to see if your feature ' + //->
+                        'is already in the works. We are very engaged with our user community and the more popular a new feature ' + //->
+                        'is the more attention we can dedicate to it.</p>' + //->
+                        '<p>Want to flex your coding kung fu? <a href="https://github.com/CenturyLinkCloud/pdmk">Check out the ' + //->
+                        '[pdmk] code repo</a> and submit your solution.</p>' + //->
+                        '<div class="plastic-form-title" style="text-align:left;">' + //->
+                        'What is [pdmk]\'s Current Version ?</div>' + //->
+                        '<p>Currently [pdmk] is in public-beta (codename: Epoxy).  Once all features have been tested as ' + //->
+                        'working and complete its version will move to version 1.0.0 (codename: "Polylactic Acid").</p>' + //->
+                        '<div class="plastic-form-title" style="text-align:left;">' + //->
+                        'What\'s up with the name ?</div>' + //->
+                        '<p>"Plastic Data Modeling Kit" [pdmk] comes from how flexible all of the components are and the ' + //->
+                        'way applications are built. Plastic Data can be easily molded or adapted to any shape ' + //->
+                        'and this toolkit allows one to assemble applications similar to plastic car or airplane model kit.</p>' + //->
                         '<div style="position:relative;">' + //->
                         '<img src="images/plastic-information.png" ' + //->
                              'style="position:absolute;width:30px;height:30px;top:-5px;right:-5px;">' + //->
-                        '<pre style="border:solid #eeeeff;padding:0px 15px;overflow:auto;margin-left:80px;">\n' + //->
+                        '<pre style="border:solid #eeeeff;padding:0px 15px;overflow:auto;margin-left:80px;font-size:11px;">\n' + //->
                         'Plastic:\n' + //->
                         '  - formative, creative\n' + //->
                         '  - capable of being molded or modeled plastic clay\n' + //->
@@ -92,8 +150,8 @@ Plastic.RegisterDatastore({
             {
                 title: 'Introduction to Plastic', tooltip: 'Introduction', type: 'introduction', key: 'introduction'
                ,attributes: {
-                    preinlinehelp: '<div>' + //->
-                        '<div style="font-size:18px;font-weight:bold;text-align:center;">' + //->
+                    preinlinehelp: '<div style="font-style:normal;">' + //->
+                        '<div class="plastic-form-title" style="margin-top:0px;">' + //->
                         'Introduction to Plastic Data Modeling Kit <nobr>[<img src="images/pdmklogo_plainback01_sm.png" ' + //->
                         'style="vertical-align:middle;" title="Plastic Data Modeling Kit">]</nobr></div>' + //->
                         '<div style="text-align:right;"><span activate="help">&lt;&lt; Back to Help Topics</span></div>' + //->
@@ -120,8 +178,8 @@ Plastic.RegisterDatastore({
            ,{
                 title: 'Getting Started With [pdmk]', tooltip: 'Getting Started', type: 'start', key: 'start'
                ,attributes: {
-                    preinlinehelp: '<div>' + //->
-                        '<div style="font-size:18px;font-weight:bold;text-align:center;">' + //->
+                    preinlinehelp: '<div style="font-style:normal;">' + //->
+                        '<div class="plastic-form-title" style="margin-top:0px;">' + //->
                         'Getting Started With <nobr>[<img src="images/pdmklogo_plainback01_sm.png" ' + //->
                         'style="vertical-align:middle;" title="Plastic Data Modeling Kit">]</nobr></div>' + //->
                         'The easiest way to get started with [pdmk] is to dive right in and take one of ' + //->
@@ -136,9 +194,35 @@ Plastic.RegisterDatastore({
                         'project\'s site and add the following code to activate all that is plastic.<br><br>' + //->
                         '<pre class="prettyprint linenums">\n' + //->
                         '&lt;script src="https://ioneyez.github.io/pdmk/scripts/pdmk-min.js" type="text/javascript"&gt;&lt;/script&gt;\n' + //->
-                        '&lt;link  href="https://ioneyez.github.io/pdmk/style/pdmk-min.css" rel="stylesheet" type="text/css"&gt;\n' + //->
+                        '&lt;link  href="https://ioneyez.github.io/pdmk/style/pdmk-min.css" rel="stylesheet" type="text/css"&gt;\n\n' + //->
+                        '&lt;!-- Optional "Demo" Datastore --&gt;\n' + //->
                         '&lt;script src="https://ioneyez.github.io/pdmk/scripts/PlasticDatastoreHelp.js" type="text/javascript"&gt;&lt;/script&gt;\n' + //->
-                        '</pre>' + //->
+                        '</pre><br>' + //->
+                        'To help get you on your way, take a quick look at our video tutorial:<br><br>' + //->
+                        '<div class="pdmk-flowplayer" ' + //->
+                        '    style="display:block;width:650px;height:366px;background-image:url(videos/intro_part1of4.png);">\n' + //->
+                        '    <video data-embed="false">\n' + //->
+                        '        <source type="video/mp4"  src="videos/pdmktut_1of4.m4v">\n' + //->
+                        '    </video>\n' + //->
+                        '</div><br><br>\n' + //->
+                        '<div class="pdmk-flowplayer" ' + //->
+                        '    style="display:block;width:650px;height:366px;background-image:url(videos/intro_part2of4.png);">\n' + //->
+                        '    <video>\n' + //->
+                        '        <source type="video/mp4"  src="videos/pdmktut_2of4.m4v">\n' + //->
+                        '    </video>\n' + //->
+                        '</div><br><br>\n' + //->
+                        '<div class="pdmk-flowplayer" ' + //->
+                        '    style="display:block;width:650px;height:366px;background-image:url(videos/intro_part3of4.png);">\n' + //->
+                        '    <video>\n' + //->
+                        '        <source type="video/mp4"  src="videos/pdmktut_3of4.m4v">\n' + //->
+                        '    </video>\n' + //->
+                        '</div><br><br>\n' + //->
+                        '<div class="pdmk-flowplayer" ' + //->
+                        '    style="display:block;width:650px;height:366px;background-image:url(videos/intro_part4of4.png);">\n' + //->
+                        '    <video>\n' + //->
+                        '        <source type="video/mp4"  src="videos/pdmktut_4of4.m4v">\n' + //->
+                        '    </video>\n' + //->
+                        '</div><br><br>\n' + //->
                         'Select from the help sections on the left for more information and <span activate="examples">examples</span>.' + //->
                         '</div>'
                 }
@@ -146,8 +230,8 @@ Plastic.RegisterDatastore({
            ,{
                 title: 'Datastore Object', tooltip: 'Datastore Object', type: 'datastore', key: 'datastore'
                ,attributes: {
-                    preinlinehelp: '<div>' + //->
-                        '<div style="font-size:18px;font-weight:bold;text-align:center;">' + //->
+                    preinlinehelp: '<div style="font-style:normal;">' + //->
+                        '<div class="plastic-form-title" style="margin-top:0px;">' + //->
                         'The Datastore Object <nobr>[<img src="images/pdmklogo_plainback01_sm.png" ' + //->
                         'style="vertical-align:middle;" title="Plastic Data Modeling Kit">]</nobr></div>' + //->
                         '<div style="text-align:right;"><span activate="introduction">&lt;&lt; Back to Introduction</span></div>' + //->
@@ -282,8 +366,8 @@ Plastic.RegisterDatastore({
                 {
                     title: 'The rowObject Structure', tooltip: 'The rowObject Structure', type: 'rowobject', key: 'rowobject'
                    ,attributes: {
-                        preinlinehelp: '<div>' + //->
-                            '<div style="font-size:18px;font-weight:bold;text-align:center;">' + //->
+                        preinlinehelp: '<div style="font-style:normal;">' + //->
+                            '<div class="plastic-form-title" style="margin-top:0px;">' + //->
                             'The rowObject Structure <nobr>[<img src="images/pdmklogo_plainback01_sm.png" ' + //->
                             'style="vertical-align:middle;" title="Plastic Data Modeling Kit">]</nobr></div>' + //->
                             '<div style="text-align:right;"><span activate="datastore">&lt;&lt; Back to Datastore</span></div>' + //->
@@ -328,8 +412,8 @@ Plastic.RegisterDatastore({
            ,{
                 title: 'Component Classes', tooltip: 'Component Classes', type: 'component', key: 'component'
                ,attributes: {
-                    preinlinehelp: '<div>' + //->
-                        '<div style="font-size:18px;font-weight:bold;text-align:center;">' + //->
+                    preinlinehelp: '<div style="font-style:normal;">' + //->
+                        '<div class="plastic-form-title" style="margin-top:0px;">' + //->
                         'The <nobr>[<img src="images/pdmklogo_plainback01_sm.png" ' + //->
                         'style="vertical-align:middle;" title="Plastic Data Modeling Kit">]</nobr> ' + //->
                         'Component Classes</div>' + //->
@@ -351,9 +435,9 @@ Plastic.RegisterDatastore({
                 {
                     title: 'Stack Class', tooltip: 'Stack Component Class', type: 'stack', key: 'stack'
                    ,attributes: {
-                        preinlinehelp: '<div>' + //->
-                            '<div style="font-size:18px;font-weight:bold;text-align:center;">' + //->
-                            'The Stack Component Class</div><br>' + //->
+                        preinlinehelp: '<div style="font-style:normal;">' + //->
+                            '<div class="plastic-form-title" style="margin-top:0px;">' + //->
+                            'The Stack Component Class</div>' + //->
                             '<div style="text-align:right;"><span activate="component">&lt;&lt; Back to Component Classes</span></div>' + //->
                             'The Stack component class provides geometry and layout management components ' + //->
                             'or "where" and "when" view and widget components are displayed.  Example ' + //->
@@ -372,9 +456,9 @@ Plastic.RegisterDatastore({
                     {
                         title: 'Tab Stack', tooltip: 'The Stack-Tab Component', type: 'stack-tab', key: 'stack-tab'
                        ,attributes: {
-                            preinlinehelp: '<div>' + //->
-                                '<div style="font-size:18px;font-weight:bold;text-align:center;">' + //->
-                                'The Tab Stack [stack-tab] Component</div><br>' + //->
+                            preinlinehelp: '<div style="font-style:normal;">' + //->
+                                '<div class="plastic-form-title" style="margin-top:0px;">' + //->
+                                'The Tab Stack [stack-tab] Component</div>' + //->
                                 '<div style="text-align:right;"><span activate="stack">&lt;&lt; Back to Stack</span></div>' + //->
                                 'The tab component provides a number of components stacked on top of one ' + //->
                                 'another with clickable "tabs" for the user to easilly switch between them. ' + //->
@@ -416,9 +500,9 @@ Plastic.RegisterDatastore({
                    ,{
                         title: 'HSplit Stack', tooltip: 'The Stack-HSplit Component', type: 'stack-hsplit', key: 'stack-hsplit'
                        ,attributes: {
-                            preinlinehelp: '<div>' + //->
-                                '<div style="font-size:18px;font-weight:bold;text-align:center;">' + //->
-                                'The Horizontal Split Stack [stack-hsplit] Component</div><br>' + //->
+                            preinlinehelp: '<div style="font-style:normal;">' + //->
+                                '<div class="plastic-form-title" style="margin-top:0px;">' + //->
+                                'The Horizontal Split Stack [stack-hsplit] Component</div>' + //->
                                 '<div style="text-align:right;"><span activate="stack">&lt;&lt; Back to Stack</span></div>' + //->
                                 'The tab component provides a number of components stacked on top of one ' + //->
                                 'The hsplit component provides a number of components stacked beside one ' + //->
@@ -460,9 +544,9 @@ Plastic.RegisterDatastore({
                    ,{
                         title: 'VSplit Stack', tooltip: 'The Stack-VSplit Component', type: 'stack-vsplit', key: 'stack-vsplit'
                        ,attributes: {
-                            preinlinehelp: '<div>' + //->
-                                '<div style="font-size:18px;font-weight:bold;text-align:center;">' + //->
-                                'The Vertical Split Stack [stack-vsplit] Component</div><br>' + //->
+                            preinlinehelp: '<div style="font-style:normal;">' + //->
+                                '<div class="plastic-form-title" style="margin-top:0px;">' + //->
+                                'The Vertical Split Stack [stack-vsplit] Component</div>' + //->
                                 '<div style="text-align:right;"><span activate="stack">&lt;&lt; Back to Stack</span></div>' + //->
                                 'The vsplit component provides a number of components stacked beside on top ' + //->
                                 'of one another with optional draggable "splitters" for the user to easilly' + //->
@@ -503,9 +587,9 @@ Plastic.RegisterDatastore({
                    ,{
                         title: 'Stack Stack', tooltip: 'The Stack-Stack Component', type: 'stack-stack', key: 'stack-stack'
                        ,attributes: {
-                            preinlinehelp: '<div>' + //->
-                                '<div style="font-size:18px;font-weight:bold;text-align:center;">' + //->
-                                'The Stack Stack [stack-stack] Component</div><br>' + //->
+                            preinlinehelp: '<div style="font-style:normal;">' + //->
+                                '<div class="plastic-form-title" style="margin-top:0px;">' + //->
+                                'The Stack Stack [stack-stack] Component</div>' + //->
                                 '<div style="text-align:right;"><span activate="stack">&lt;&lt; Back to Stack</span></div>' + //->
                                 'The stack component provides a number of components stacked beside on top ' + //->
                                 'of one another with optional draggable "splitters" for the user to easilly' + //->
@@ -553,9 +637,9 @@ Plastic.RegisterDatastore({
                ,{
                     title: 'View Class', tooltip: 'View Component Class', type: 'view', key: 'view'
                    ,attributes: {
-                        preinlinehelp: '<div>' + //->
-                            '<div style="font-size:18px;font-weight:bold;text-align:center;">' + //->
-                            'The View Component Class</div><br>' + //->
+                        preinlinehelp: '<div style="font-style:normal;">' + //->
+                            '<div class="plastic-form-title" style="margin-top:0px;">' + //->
+                            'The View Component Class</div>' + //->
                             '<div style="text-align:right;"><span activate="component">&lt;&lt; Back to Component Classes</span></div>' + //->
                             'The View component class provides navigation and interaction components ' + //->
                             'or "what" and "how" stack and widget components are selected.  Example ' + //->
@@ -572,9 +656,9 @@ Plastic.RegisterDatastore({
                     {
                         title: 'Tree View', tooltip: 'The View-Tree Component', type: 'view-tree', key: 'view-tree'
                        ,attributes: {
-                            preinlinehelp: '<div>' + //->
-                                '<div style="font-size:18px;font-weight:bold;text-align:center;">' + //->
-                                'The Tree View [view-tree] Component</div><br><br>' + //->
+                            preinlinehelp: '<div style="font-style:normal;">' + //->
+                                '<div class="plastic-form-title" style="margin-top:0px;">' + //->
+                                'The Tree View [view-tree] Component</div>' + //->
                                 'The tree component provides a hierarchically nested list of rowObjects ' + //->
                                 'where only rowObject titles are displayed for each row.  Activating a ' + //->
                                 'row renders (initializes) another \'target\' component within the plabook ' + 
@@ -599,9 +683,9 @@ Plastic.RegisterDatastore({
                    ,{
                        title: 'List View', tooltip: 'The View-List Component', type: 'view-list', key: 'view-list'
                        ,attributes: {
-                            preinlinehelp: '<div>' + //->
-                                '<div style="font-size:18px;font-weight:bold;text-align:center;">' + //->
-                                'The List View [view-list] Component</div><br><br>' + //->
+                            preinlinehelp: '<div style="font-style:normal;">' + //->
+                                '<div class="plastic-form-title" style="margin-top:0px;">' + //->
+                                'The List View [view-list] Component</div>' + //->
                                 'The list component provides a number of components stacked on top of one ' + //->
                                 'another with clickable "tabs" for the user to easilly switch between them. ' + //->
                                 'Think of the subordinate (child) components as a deck of cards with labeled ' + 
@@ -629,13 +713,13 @@ Plastic.RegisterDatastore({
                ,{
                     title: 'Widget Class', tooltip: 'Widget Component Class', type: 'widget', key: 'widget'
                    ,attributes: {
-                        preinlinehelp: '<div>' + //->
-                            '<div style="font-size:18px;font-weight:bold;text-align:center;">' + //->
-                            'The Widget Component Class</div><br>' + //->
+                        preinlinehelp: '<div style="font-style:normal;">' + //->
+                            '<div class="plastic-form-title" style="margin-top:0px;">' + //->
+                            'The Widget Component Class</div>' + //->
                             '<div style="text-align:right;"><span activate="component">&lt;&lt; Back to Component Classes</span></div>' + //->
                             'The Widget component class provides direct "row-level" interaction components ' + //->
-                            'or "what" and "how" stack and widget components are selected.  Example ' + //->
-                            'view components would be tree and list.<br><br>' + //->
+                            'and allows specific details for the selected components to be edited.  Example ' + //->
+                            'widget components would be form and context.<br><br>' + //->
                             'The next few sections describe the components of this class:<br>' + //->
                             '<ul><li><span activate="widget-form">Form Widget</span></li>' + //->
                             '<li><span activate="widget-context">Context Widget</span></li>' + //->
@@ -651,8 +735,8 @@ Plastic.RegisterDatastore({
                     {
                         title: 'Form Widget', tooltip: 'The Widget-Form Component', type: 'widget-form', key: 'widget-form'
                        ,attributes: {
-                            preinlinehelp: '<div>' + //->
-                                '<div style="font-size:18px;font-weight:bold;text-align:center;">' + //->
+                            preinlinehelp: '<div style="font-style:normal;">' + //->
+                                '<div class="plastic-form-title" style="margin-top:0px;">' + //->
                                 'The Form Widget [widget-form] Component</div>' + //->
                                 '<div style="text-align:right;"><span activate="widget">&lt;&lt; Back to Widget</span></div>' + //->
                                 'The form widget component creates an interactive html form based upon the ' + //->
@@ -699,8 +783,8 @@ Plastic.RegisterDatastore({
                    ,{
                         title: 'Context Widget', tooltip: 'The Widget-Context Component', type: 'widget-context', key: 'widget-context'
                        ,attributes: {
-                            preinlinehelp: '<div>' + //->
-                                '<div style="font-size:18px;font-weight:bold;text-align:center;">' + //->
+                            preinlinehelp: '<div style="font-style:normal;">' + //->
+                                '<div class="plastic-form-title" style="margin-top:0px;">' + //->
                                 'The Context Widget [widget-context] Component</div>' + //->
                                 '<div style="text-align:right;"><span activate="widget">&lt;&lt; Back to Widget</span></div>' + //->
                                 'The context widget component creates a floating menu based on its ' + //->
@@ -747,8 +831,8 @@ Plastic.RegisterDatastore({
                    ,{
                         title: 'Buttonbar Widget', tooltip: 'The Widget-Buttonbar Component', type: 'widget-buttonbar', key: 'widget-buttonbar'
                        ,attributes: {
-                            preinlinehelp: '<div>' + //->
-                                '<div style="font-size:18px;font-weight:bold;text-align:center;">' + //->
+                            preinlinehelp: '<div style="font-style:normal;">' + //->
+                                '<div class="plastic-form-title" style="margin-top:0px;">' + //->
                                 'The Buttonbar Widget [widget-buttonbar] Component</div>' + //->
                                 '<div style="text-align:right;"><span activate="widget">&lt;&lt; Back to Widget</span></div>' + //->
                                 'The buttonbar widget component creates a row of buttons based on its ' + //->
@@ -786,8 +870,8 @@ Plastic.RegisterDatastore({
                    ,{
                         title: 'Dialog Widget', tooltip: 'The Widget-Dialog Component', type: 'widget-dialog', key: 'widget-dialog'
                        ,attributes: {
-                            preinlinehelp: '<div>' + //->
-                                '<div style="font-size:18px;font-weight:bold;text-align:center;">' + //->
+                            preinlinehelp: '<div style="font-style:normal;">' + //->
+                                '<div class="plastic-form-title" style="margin-top:0px;">' + //->
                                 'The Dialog Widget [widget-dialog] Component</div>' + //->
                                 '<div style="text-align:right;"><span activate="widget">&lt;&lt; Back to Widget</span></div>' + //->
                                 'The dialog widget component creates a modal popup window within the [pdmk] application ' + //->
@@ -820,8 +904,8 @@ Plastic.RegisterDatastore({
                     }
                    ,{   title: 'Iframe Widget', tooltip: 'The Widget-Iframe Component', type: 'widget-iframe', key: 'widget-iframe'
                        ,attributes: {
-                            preinlinehelp: '<div>' + //->
-                                '<div style="font-size:18px;font-weight:bold;text-align:center;">' + //->
+                            preinlinehelp: '<div style="font-style:normal;">' + //->
+                                '<div class="plastic-form-title" style="margin-top:0px;">' + //->
                                 'The Iframe Widget [widget-iframe] Component</div>' + //->
                                 '<div style="text-align:right;"><span activate="widget">&lt;&lt; Back to Widget</span></div>' + //->
                                 'The iframe widget component creates a framed browser window within the [pdmk] application ' + //->
@@ -846,9 +930,9 @@ Plastic.RegisterDatastore({
            ,{
                 title: 'Actions [Events]', tooltip: 'Plastic Actions [Event Handling]', type: 'action', key: 'action'
                ,attributes: {
-                    preinlinehelp: '<div>' + //->
-                        '<div style="font-size:18px;font-weight:bold;text-align:center;">' + //->
-                        'Plastic Actions [Event Handling]</div><br>' + //->
+                    preinlinehelp: '<div style="font-style:normal;">' + //->
+                        '<div class="plastic-form-title" style="margin-top:0px;">' + //->
+                        'Plastic Actions [Event Handling]</div>' + //->
                         '<div style="text-align:right;"><span activate="widget">&lt;&lt; Back to the Widget Component Class</span></div>' + //->
                         'The [pdmk] toolkit provides a suite of generalized/ context-aware "actions" ' + //->
                         'or "events" which can be specified in the <span activate="playbook">Playbook</span>. ' + //->
@@ -865,9 +949,9 @@ Plastic.RegisterDatastore({
                 {
                     title: 'Plastic Actions', tooltip: 'Performing Generalized Actions [Events]', type: 'action', key: 'actions'
                    ,attributes: {
-                        preinlinehelp: '<div>' + //->
-                            '<div style="font-size:18px;font-weight:bold;text-align:center;">' + //->
-                            'Performing Generalized Actions [Events]</div><br>' + //->
+                        preinlinehelp: '<div style="font-style:normal;">' + //->
+                            '<div class="plastic-form-title" style="margin-top:0px;">' + //->
+                            'Performing Generalized Actions [Events]</div>' + //->
                             '<div style="text-align:right;"><span activate="action">&lt;&lt; Back to Actions [Events]</span></div>' + //->
                             'The [pdmk] toolkit provides a generalized set of defined "actions" or "events" ' + //->
                             'which can be performed on an active <span activate="rowobject">rowObject</span>. ' + //->
@@ -912,9 +996,9 @@ Plastic.RegisterDatastore({
                ,{
                     title: 'Plastic Tests', tooltip: 'Testing Whether Actions Are Allowed', type: 'tests', key: 'tests'
                    ,attributes: {
-                        preinlinehelp: '<div>' + //->
-                            '<div style="font-size:18px;font-weight:bold;text-align:center;">' + //->
-                            'Testing Whether Actions Are Allowed</div><br>' + //->
+                        preinlinehelp: '<div style="font-style:normal;">' + //->
+                            '<div class="plastic-form-title" style="margin-top:0px;">' + //->
+                            'Testing Whether Actions Are Allowed</div>' + //->
                             '<div style="text-align:right;"><span activate="action">&lt;&lt; Back to Actions [Events]</span></div>' + //->
                             'The [pdmk] toolkit provides a generalized manner of testing whether or not ' + //->
                             'an <span activate="actions">action</span> should be allowed by performing a series ' + //->
@@ -972,9 +1056,9 @@ Plastic.RegisterDatastore({
            ,{
                 title: 'The Plastic Playbook', tooltip: 'The Plastic Playbook', type: 'playbook', key: 'playbook'
                ,attributes: {
-                    preinlinehelp: '<div>' + //->
-                        '<div style="font-size:18px;font-weight:bold;text-align:center;">' + //->
-                        'The Plastic Playbook</div><br>' + //->
+                    preinlinehelp: '<div style="font-style:normal;">' + //->
+                        '<div class="plastic-form-title" style="margin-top:0px;">' + //->
+                        'The Plastic Playbook</div>' + //->
                         '<div style="text-align:right;"><span activate="action">&lt;&lt; Back to Actions [Events]</span></div>' + //->
                         'By far, the easiest way to understand the [pdmk] Playbook is to visualize every phase of ' + //->
                         'an application (any application). An example may be an airline reservation application. ' + //->
@@ -1046,9 +1130,9 @@ Plastic.RegisterDatastore({
            ,{
                 title: 'Examples [JSFiddle]', tooltip: 'Plastic Samples on JSFiddle', type: 'instructions', key: 'examples'
                ,attributes: {
-                    preinlinehelp: '<div>' + //->
-                        '<div style="font-size:18px;font-weight:bold;text-align:center;">' + //->
-                        'Examples on JSFiddle</div><br>' + //->
+                    preinlinehelp: '<div style="font-style:normal;">' + //->
+                        '<div class="plastic-form-title" style="margin-top:0px;">' + //->
+                        'Examples on JSFiddle</div>' + //->
                         '<div style="text-align:right;"><span activate="playbook">&lt;&lt; Back to Playbook</span></div>' + //->
                         'The following sections provide [pdmk] examples using the powerful JSFiddle testing ' + //->
                         'engine.<br><br>' + //->
@@ -1102,9 +1186,9 @@ Plastic.RegisterDatastore({
            ,{
                 title: 'Project Roadmap [Bakelite]', tooltip: 'Project Roadmap [Bakelite]', type: 'roadmap', key: 'roadmap'
                ,attributes: {
-                    preinlinehelp: '<div>' + //->
-                        '<div style="font-size:18px;font-weight:bold;text-align:center;">' + //->
-                        'Project Roadmap [Bakelite]</div><br>' + //->
+                    preinlinehelp: '<div style="font-style:normal;">' + //->
+                        '<div class="plastic-form-title" style="margin-top:0px;">' + //->
+                        'Project Roadmap [Bakelite]</div>' + //->
                         '<div style="text-align:right;"><span activate="examples">&lt;&lt; Back to Examples</span></div>' + //->
                         'This following sections define scheduled changes and enhancements on the [pdmk] product roadmap. ' + //->
                         'Some of these features may be currently in an uncooked state and must continue baking before ' + //->
@@ -1123,9 +1207,9 @@ Plastic.RegisterDatastore({
                 {
                     title: 'Version 1.0.0 [PLA]', tooltip: 'Version 1.0.0 - "Polylactic Acid"', type: 'version100', key: 'version100'
                    ,attributes: {
-                        preinlinehelp: '<div>' + //->
-                            '<div style="font-size:18px;font-weight:bold;text-align:center;">' + //->
-                            'Version 1.0.0 - "Polylactic Acid"</div><br>' + //->
+                        preinlinehelp: '<div style="font-style:normal;">' + //->
+                            '<div class="plastic-form-title" style="margin-top:0px;">' + //->
+                            'Version 1.0.0 - "Polylactic Acid"</div>' + //->
                             '<div style="text-align:right;"><span activate="roadmap">&lt;&lt; Back to Bakelite</span></div>' + //->
                             'Version 1.0.0 will be released after completion of any major bugfixes.  All ' + //->
                             'components of the public-beta release [Epoxy] will then be considered complete, rolled ' + //->
@@ -1136,9 +1220,9 @@ Plastic.RegisterDatastore({
                ,{
                     title: 'Version 1.2.0 [PC]', tooltip: 'Version 1.2.0 - "Polycarbonate"', type: 'version120', key: 'version120'
                    ,attributes: {
-                        preinlinehelp: '<div>' + //->
-                            '<div style="font-size:18px;font-weight:bold;text-align:center;">' + //->
-                            'Version 1.2.0 - "Polycarbonate"</div><br>' + //->
+                        preinlinehelp: '<div style="font-style:normal;">' + //->
+                            '<div class="plastic-form-title" style="margin-top:0px;">' + //->
+                            'Version 1.2.0 - "Polycarbonate"</div>' + //->
                             '<div style="text-align:right;"><span activate="roadmap">&lt;&lt; Back to Bakelite</span></div>' + //->
                             'Version 1.2.0 will include the following changes:<br><br>' + //->
                             'Updated components:<br>' + //->
@@ -1156,9 +1240,9 @@ Plastic.RegisterDatastore({
                ,{
                     title: 'Version 1.4.0 [ABS]', tooltip: 'Version 1.4.0 - "Acrylonitrile Butadiene Styrene"', type: 'version140', key: 'version140'
                    ,attributes: {
-                        preinlinehelp: '<div>' + //->
-                            '<div style="font-size:18px;font-weight:bold;text-align:center;">' + //->
-                            'Version 1.4.0 - "Acrylonitrile Butadiene Styrene"</div><br>' + //->
+                        preinlinehelp: '<div style="font-style:normal;">' + //->
+                            '<div class="plastic-form-title" style="margin-top:0px;">' + //->
+                            'Version 1.4.0 - "Acrylonitrile Butadiene Styrene"</div>' + //->
                             '<div style="text-align:right;"><span activate="roadmap">&lt;&lt; Back to Bakelite</span></div>' + //->
                             'Version 1.4.0 will include the following changes:<br><br>' + //->
                             'New components:<br>' + //->
@@ -1178,9 +1262,9 @@ Plastic.RegisterDatastore({
                ,{
                     title: 'Version 1.6.0 [HDPE]', tooltip: 'Version 1.6.0 - "High Density Polyethylene"', type: 'version160', key: 'version160'
                    ,attributes: {
-                        preinlinehelp: '<div>' + //->
-                            '<div style="font-size:18px;font-weight:bold;text-align:center;">' + //->
-                            'Version 1.6.0 - "High Density Polyethylene"</div><br>' + //->
+                        preinlinehelp: '<div style="font-style:normal;">' + //->
+                            '<div class="plastic-form-title" style="margin-top:0px;">' + //->
+                            'Version 1.6.0 - "High Density Polyethylene"</div>' + //->
                             '<div style="text-align:right;"><span activate="roadmap">&lt;&lt; Back to Bakelite</span></div>' + //->
                             'Version 1.6.0 will include the following changes:<br><br>' + //->
                             'Updated components:<br>' + //->
@@ -1195,9 +1279,9 @@ Plastic.RegisterDatastore({
                ,{
                     title: 'Version 1.8.0 [PVC]', tooltip: 'Version 1.8.0 - "Polyvinyl Chloride"', type: 'version180', key: 'version180'
                    ,attributes: {
-                        preinlinehelp: '<div>' + //->
-                            '<div style="font-size:18px;font-weight:bold;text-align:center;">' + //->
-                            'Version 1.8.0 - "Polyvinyl Chloride"</div><br>' + //->
+                        preinlinehelp: '<div style="font-style:normal;">' + //->
+                            '<div class="plastic-form-title" style="margin-top:0px;">' + //->
+                            'Version 1.8.0 - "Polyvinyl Chloride"</div>' + //->
                             '<div style="text-align:right;"><span activate="roadmap">&lt;&lt; Back to Bakelite</span></div>' + //->
                             'Version 1.8.0 will include the following changes:<br><br>' + //->
                             'New components:<br>' + //->
@@ -1210,9 +1294,9 @@ Plastic.RegisterDatastore({
                ,{
                     title: 'Version 2.0.0 [PET]', tooltip: 'Version 2.0.0 - "Polyethylene Terephthalate"', type: 'version200', key: 'version200'
                    ,attributes: {
-                        preinlinehelp: '<div>' + //->
-                            '<div style="font-size:18px;font-weight:bold;text-align:center;">' + //->
-                            'Version 2.0.0 - "Polyethylene Terephthalate"</div><br>' + //->
+                        preinlinehelp: '<div style="font-style:normal;">' + //->
+                            '<div class="plastic-form-title" style="margin-top:0px;">' + //->
+                            'Version 2.0.0 - "Polyethylene Terephthalate"</div>' + //->
                             '<div style="text-align:right;"><span activate="roadmap">&lt;&lt; Back to Bakelite</span></div>' + //->
                             'Version 2.0.0 will include the following changes:<br><br>' + //->
                             'New components:<br>' + //->
@@ -1225,19 +1309,19 @@ Plastic.RegisterDatastore({
            ,{
                 title: 'LICENSE', tooltip: 'License [MIT]', type: 'license', key: 'license'
                ,attributes: {
-                    preinlinehelp: '<div>' + //->
-                        '<div style="font-size:18px;font-weight:bold;text-align:center;">' + //->
+                    preinlinehelp: '<div style="font-style:normal;">' + //->
+                        '<div class="plastic-form-title" style="margin-top:0px;">' + //->
                         'LICENSE TERMS [MIT]</div>' + //->
                         '<pre class="plastic-legal" style="font-size:10px;">\n' + //->
-                        'Copyright (c) 2014-2015 CenturyLink, Inc.\n\n\n' + //->
+                        'Copyright (c) 2014-2015 CenturyLink, Inc.\n\n' + //->
                         'Permission is hereby granted, free of charge, to any person obtaining a copy\n' + //->
                         'of this software and associated documentation files (the "Software"), to deal\n' + //->
                         'in the Software without restriction, including without limitation the rights\n' + //->
                         'to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\n' + //->
                         'copies of the Software, and to permit persons to whom the Software is\n' + //->
-                        'furnished to do so, subject to the following conditions:\n\n\n' + //->
+                        'furnished to do so, subject to the following conditions:\n\n' + //->
                         'The above copyright notice and this permission notice shall be included in\n' + //->
-                        'all copies or substantial portions of the Software.\n\n\n' + //->
+                        'all copies or substantial portions of the Software.\n\n' + //->
                         'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n' + //->
                         'IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n' + //->
                         'FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE\n' + //->
@@ -1250,11 +1334,11 @@ Plastic.RegisterDatastore({
                 }
             }
            ,{
-                title: 'CREDITS', tooltip: 'Credits and Contributions', type: 'credits'
+                title: 'CREDITS', tooltip: 'Credits and Contributions', type: 'credits', key: 'credits'
                ,attributes: {
-                    preinlinehelp: '<div>' + //->
-                        '<div style="font-size:18px;font-weight:bold;text-align:center;">' + //->
-                        'Credits and Contributions</div><br><br>' + //->
+                    preinlinehelp: '<div style="font-style:normal;">' + //->
+                        '<div class="plastic-form-title" style="margin-top:0px;">' + //->
+                        'Credits and Contributions</div>' + //->
                         '<pre class="plastic-legal" style="font-size:10px;">\n' + //->
                         'Copyright (c) 2014-2015 CenturyLink, Inc.\n\n\n' + //->
                         'The Plastic Data Modeling Kit [pdmk] is a 100% JavaScript data modeling toolkit\n' + //->
@@ -1512,61 +1596,79 @@ Plastic.RegisterDatastore({
        ,delimiter: '/'
        ,rootTitle: 'US States'
        ,includeRoot: false
-       ,rootRowObject: {
-                title: 'US States', tooltip: 'US States', type: 'root', key: 'root', next: '/Alabama'
+       ,prettyNames: {
+            title: 'State'
+           ,capital: 'State Capital'
+           ,remainpop: 'Remaining Population'
+           ,pop: 'Population'
+           ,remainseat: 'Remaining Seats'
+           ,seat: 'Seats in US House'
+           ,remainperc: 'Remaining Percentage'
+           ,perc: '% of US Population'
+           ,maxveh: 'Based upon Max'
+           ,veh: 'Vehicles per Capita'
         }
-       ,rowDefault: { custom1: 'list', custom2: false, active: true }
+       ,rootRowObject: {
+            title: 'US States', tooltip: 'US States', type: 'root', key: 'root', next: '/Alabama', attributes: { pop: 320746592, seat: 435, perc: 100, veh: 1140 }
+        }
+       ,rowDefault: function(data) {
+            return {    remainpop:  (data) ? (320746592 - data.pop) : 0
+                       ,remainseat: (data) ? (435 - data.seat) : 0
+                       ,remainperc: (data) ? (100 - data.perc) : 0
+                       ,maxveh:     (data) ? (1140 - data.veh) : 0
+                   };
+        }
        ,data: [
-            { title: 'Alabama', tooltip: 'Alabama', type: 'folder', key: '/Alabama', attributes: { capital: 'Montgomery' } }
-           ,{ title: 'Alaska', tooltip: 'Alaska', type: 'folder', key: '/Alaska', attributes: { capital: 'Juneau' } }
-           ,{ title: 'Arizona', tooltip: 'Arizona', type: 'folder', key: '/Arizona', attributes: { capital: 'Phoenix' } }
-           ,{ title: 'Arkansas', tooltip: 'Arkansas', type: 'folder', key: '/Arkansas', attributes: { capital: 'Little Rock' } }
-           ,{ title: 'California', tooltip: 'California', type: 'folder', key: '/California', attributes: { capital: 'Sacramento' } }
-           ,{ title: 'Colorado', tooltip: 'Colorado', type: 'folder', key: '/Colorado', attributes: { capital: 'Denver' } }
-           ,{ title: 'Connecticut', tooltip: 'Connecticut', type: 'folder', key: '/Connecticut', attributes: { capital: 'Hartford' } }
-           ,{ title: 'Delaware', tooltip: 'Delaware', type: 'folder', key: '/Delaware', attributes: { capital: 'Dover' } }
-           ,{ title: 'Florida', tooltip: 'Florida', type: 'folder', key: '/Florida', attributes: { capital: 'Tallahassee' } }
-           ,{ title: 'Georgia', tooltip: 'Georgia', type: 'folder', key: '/Georgia', attributes: { capital: 'Atlanta' } }
-           ,{ title: 'Hawaii', tooltip: 'Hawaii', type: 'folder', key: '/Hawaii', attributes: { capital: 'Honolulu' } }
-           ,{ title: 'Idaho', tooltip: 'Idaho', type: 'folder', key: '/Idaho', attributes: { capital: 'Boise' } }
-           ,{ title: 'Illinois', tooltip: 'Illinois', type: 'folder', key: '/Illinois', attributes: { capital: 'Springfield' } }
-           ,{ title: 'Indiana', tooltip: 'Indiana', type: 'folder', key: '/Indiana', attributes: { capital: 'Indianapolis' } }
-           ,{ title: 'Iowa', tooltip: 'Iowa', type: 'folder', key: '/Iowa', attributes: { capital: 'Des Moines' } }
-           ,{ title: 'Kansas', tooltip: 'Kansas', type: 'folder', key: '/Kansas', attributes: { capital: 'Topeka' } }
-           ,{ title: 'Kentucky', tooltip: 'Kentucky', type: 'folder', key: '/Kentucky', attributes: { capital: 'Frankfort' } }
-           ,{ title: 'Louisiana', tooltip: 'Louisiana', type: 'folder', key: '/Louisiana', attributes: { capital: 'Baton Rouge' } }
-           ,{ title: 'Maine', tooltip: 'Maine', type: 'folder', key: '/Maine', attributes: { capital: 'Augusta' } }
-           ,{ title: 'Maryland', tooltip: 'Maryland', type: 'folder', key: '/Maryland', attributes: { capital: 'Annapolis' } }
-           ,{ title: 'Massachusetts', tooltip: 'Massachusetts', type: 'folder', key: '/Massachusetts', attributes: { capital: 'Boston' } }
-           ,{ title: 'Michigan', tooltip: 'Michigan', type: 'folder', key: '/Michigan', attributes: { capital: 'Lansing' } }
-           ,{ title: 'Minnesota', tooltip: 'Minnesota', type: 'folder', key: '/Minnesota', attributes: { capital: 'St. Paul' } }
-           ,{ title: 'Mississippi', tooltip: 'Mississippi', type: 'folder', key: '/Mississippi', attributes: { capital: 'Jackson' } }
-           ,{ title: 'Missouri', tooltip: 'Missouri', type: 'folder', key: '/Missouri', attributes: { capital: 'Jefferson City' } }
-           ,{ title: 'Montana', tooltip: 'Montana', type: 'folder', key: '/Montana', attributes: { capital: 'Helena' } }
-           ,{ title: 'Nebraska', tooltip: 'Nebraska', type: 'folder', key: '/Nebraska', attributes: { capital: 'Lincoln' } }
-           ,{ title: 'Nevada', tooltip: 'Nevada', type: 'folder', key: '/Nevada', attributes: { capital: 'Carson City' } }
-           ,{ title: 'New Hampshire', tooltip: 'New Hampshire', type: 'folder', key: '/New Hampshire', attributes: { capital: 'Concord' } }
-           ,{ title: 'New Jersey', tooltip: 'New Jersey', type: 'folder', key: '/New Jersey', attributes: { capital: 'Trenton' } }
-           ,{ title: 'New Mexico', tooltip: 'New Mexico', type: 'folder', key: '/New Mexico', attributes: { capital: 'Santa Fe' } }
-           ,{ title: 'New York', tooltip: 'New York', type: 'folder', key: '/New York', attributes: { capital: 'Albany' } }
-           ,{ title: 'North Carolina', tooltip: 'North Carolina', type: 'folder', key: '/North Carolina', attributes: { capital: 'Raleigh' } }
-           ,{ title: 'North Dakota', tooltip: 'North Dakota', type: 'folder', key: '/North Dakota', attributes: { capital: 'Bismarck' } }
-           ,{ title: 'Ohio', tooltip: 'Ohio', type: 'folder', key: '/Ohio', attributes: { capital: 'Columbus' } }
-           ,{ title: 'Oklahoma', tooltip: 'Oklahoma', type: 'folder', key: '/Oklahoma', attributes: { capital: 'Oklahoma City' } }
-           ,{ title: 'Oregon', tooltip: 'Oregon', type: 'folder', key: '/Oregon', attributes: { capital: 'Salem' } }
-           ,{ title: 'Pennsylvania', tooltip: 'Pennsylvania', type: 'folder', key: '/Pennsylvania', attributes: { capital: 'Harrisburg' } }
-           ,{ title: 'Rhode Island', tooltip: 'Rhode Island', type: 'folder', key: '/Rhode Island', attributes: { capital: 'Providence' } }
-           ,{ title: 'South Carolina', tooltip: 'South Carolina', type: 'folder', key: '/South Carolina', attributes: { capital: 'Columbia' } }
-           ,{ title: 'South Dakota', tooltip: 'South Dakota', type: 'folder', key: '/South Dakota', attributes: { capital: 'Pierre' } }
-           ,{ title: 'Tennessee', tooltip: 'Tennessee', type: 'folder', key: '/Tennessee', attributes: { capital: 'Nashville' } }
-           ,{ title: 'Texas', tooltip: 'Texas', type: 'folder', key: '/Texas', attributes: { capital: 'Austin' } }
-           ,{ title: 'Utah', tooltip: 'Utah', type: 'folder', key: '/Utah', attributes: { capital: 'Salt Lake City' } }
-           ,{ title: 'Vermont', tooltip: 'Vermont', type: 'folder', key: '/Vermont', attributes: { capital: 'Montpelier' } }
-           ,{ title: 'Virginia', tooltip: 'Virginia', type: 'folder', key: '/Virginia', attributes: { capital: 'Richmond' } }
-           ,{ title: 'Washington', tooltip: 'Washington', type: 'folder', key: '/Washington', attributes: { capital: 'Olympia' } }
-           ,{ title: 'West Virginia', tooltip: 'West Virginia', type: 'folder', key: '/West Virginia', attributes: { capital: 'Charleston' } }
-           ,{ title: 'Wisconsin', tooltip: 'Wisconsin', type: 'folder', key: '/Wisconsin', attributes: { capital: 'Madison' } }
-           ,{ title: 'Wyoming', tooltip: 'Wyoming', type: 'folder', key: '/Wyoming', attributes: { capital: 'Cheyenne' } }
+            { title: 'Alabama', tooltip: 'Alabama', type: 'folder', key: '/Alabama', attributes: { capital: 'Montgomery', pop: 4858979, seat: 7, perc: 1.51, veh: 1030 } }
+           ,{ title: 'Alaska', tooltip: 'Alaska', type: 'folder', key: '/Alaska', attributes: { capital: 'Juneau', pop: 738432, seat: 1, perc: .23, veh: 960 } }
+           ,{ title: 'Arizona', tooltip: 'Arizona', type: 'folder', key: '/Arizona', attributes: { capital: 'Phoenix', pop: 6828065, seat: 9, perc: 2.12, veh: 660 } }
+           ,{ title: 'Arkansas', tooltip: 'Arkansas', type: 'folder', key: '/Arkansas', attributes: { capital: 'Little Rock', pop: 2978204, seat: 4, perc: .93, veh: 700 } }
+           ,{ title: 'California', tooltip: 'California', type: 'folder', key: '/California', attributes: { capital: 'Sacramento', pop: 39144818, seat: 53, perc: 12.18, veh: 840 } }
+           ,{ title: 'Colorado', tooltip: 'Colorado', type: 'folder', key: '/Colorado', attributes: { capital: 'Denver', pop: 5456574, seat: 7, perc: 1.7, veh: 340 } }
+           ,{ title: 'Connecticut', tooltip: 'Connecticut', type: 'folder', key: '/Connecticut', attributes: { capital: 'Hartford', pop: 3590886, seat: 5, perc: 1.13, veh: 860 } }
+           ,{ title: 'Delaware', tooltip: 'Delaware', type: 'folder', key: '/Delaware', attributes: { capital: 'Dover', pop: 945934, seat: 1, perc: .29, veh: 950 } }
+           ,{ title: 'Florida', tooltip: 'Florida', type: 'folder', key: '/Florida', attributes: { capital: 'Tallahassee', pop: 20271272, seat: 27, perc: 6.31, veh: 710 } }
+           ,{ title: 'Georgia', tooltip: 'Georgia', type: 'folder', key: '/Georgia', attributes: { capital: 'Atlanta', pop: 10214860, seat: 14, perc: 3.18, veh: 820 } }
+           ,{ title: 'Hawaii', tooltip: 'Hawaii', type: 'folder', key: '/Hawaii', attributes: { capital: 'Honolulu', pop: 1431603, seat: 2, perc: .45, veh: 760 } }
+           ,{ title: 'Idaho', tooltip: 'Idaho', type: 'folder', key: '/Idaho', attributes: { capital: 'Boise', pop: 1654930, seat: 2, perc: .51, veh: 790 } }
+           ,{ title: 'Illinois', tooltip: 'Illinois', type: 'folder', key: '/Illinois', attributes: { capital: 'Springfield', pop: 12859995, seat: 18, perc: 4.0, veh: 750 } }
+           ,{ title: 'Indiana', tooltip: 'Indiana', type: 'folder', key: '/Indiana', attributes: { capital: 'Indianapolis', pop: 6619680, seat: 9, perc: 2.06, veh: 610 } }
+           ,{ title: 'Iowa', tooltip: 'Iowa', type: 'folder', key: '/Iowa', attributes: { capital: 'Des Moines', pop: 3123899, seat: 4, perc: .97, veh: 1050 } }
+           ,{ title: 'Kansas', tooltip: 'Kansas', type: 'folder', key: '/Kansas', attributes: { capital: 'Topeka', pop: 2911641, seat: 4, perc: .91, veh: 830 } }
+           ,{ title: 'Kentucky', tooltip: 'Kentucky', type: 'folder', key: '/Kentucky', attributes: { capital: 'Frankfort', pop: 4425092, seat: 6, perc: 1.38, veh: 840 } }
+           ,{ title: 'Louisiana', tooltip: 'Louisiana', type: 'folder', key: '/Louisiana', attributes: { capital: 'Baton Rouge', pop: 4670724, seat: 6, perc: 1.45, veh: 910 } }
+           ,{ title: 'Maine', tooltip: 'Maine', type: 'folder', key: '/Maine', attributes: { capital: 'Augusta', pop: 1329328, seat: 2, perc: .41, veh: 780 } }
+           ,{ title: 'Maryland', tooltip: 'Maryland', type: 'folder', key: '/Maryland', attributes: { capital: 'Annapolis', pop: 6006401, seat: 8, perc: 1.87, veh: 790 } }
+           ,{ title: 'Massachusetts', tooltip: 'Massachusetts', type: 'folder', key: '/Massachusetts', attributes: { capital: 'Boston', pop: 6794422, seat: 9, perc: 2.11, veh: 820 } }
+           ,{ title: 'Michigan', tooltip: 'Michigan', type: 'folder', key: '/Michigan', attributes: { capital: 'Lansing', pop: 9922576, seat: 14, perc: 3.11, veh: 870 } }
+           ,{ title: 'Minnesota', tooltip: 'Minnesota', type: 'folder', key: '/Minnesota', attributes: { capital: 'St. Paul', pop: 5489594, seat: 8, perc: 1.71, veh: 870 } }
+           ,{ title: 'Mississippi', tooltip: 'Mississippi', type: 'folder', key: '/Mississippi', attributes: { capital: 'Jackson', pop: 2992333, seat: 4, perc: .93, veh: 680 } }
+           ,{ title: 'Missouri', tooltip: 'Missouri', type: 'folder', key: '/Missouri', attributes: { capital: 'Jefferson City', pop: 6083672, seat: 8, perc: 1.89, veh: 830 } }
+           ,{ title: 'Montana', tooltip: 'Montana', type: 'folder', key: '/Montana', attributes: { capital: 'Helena', pop: 1032949, seat: 1, perc: .32, veh: 1120 } }
+           ,{ title: 'Nebraska', tooltip: 'Nebraska', type: 'folder', key: '/Nebraska', attributes: { capital: 'Lincoln', pop: 1896190, seat: 3, perc: .59, veh: 1000 } }
+           ,{ title: 'Nevada', tooltip: 'Nevada', type: 'folder', key: '/Nevada', attributes: { capital: 'Carson City', pop: 2890845, seat: 4, perc: .9, veh: 500 } }
+           ,{ title: 'New Hampshire', tooltip: 'New Hampshire', type: 'folder', key: '/New Hampshire', attributes: { capital: 'Concord', pop: 1330608, seat: 2, perc: .41, veh: 830 } }
+           ,{ title: 'New Jersey', tooltip: 'New Jersey', type: 'folder', key: '/New Jersey', attributes: { capital: 'Trenton', pop: 8958013, seat: 12, perc: 2.79, veh: 690 } }
+           ,{ title: 'New Mexico', tooltip: 'New Mexico', type: 'folder', key: '/New Mexico', attributes: { capital: 'Santa Fe', pop: 2085109, seat: 3, perc: .65, veh: 770 } }
+           ,{ title: 'New York', tooltip: 'New York', type: 'folder', key: '/New York', attributes: { capital: 'Albany', pop: 19795791, seat: 27, perc: 6.16, veh: 570 } }
+           ,{ title: 'North Carolina', tooltip: 'North Carolina', type: 'folder', key: '/North Carolina', attributes: { capital: 'Raleigh', pop: 10042802, seat: 13, perc: 3.12, veh: 670 } }
+           ,{ title: 'North Dakota', tooltip: 'North Dakota', type: 'folder', key: '/North Dakota', attributes: { capital: 'Bismarck', pop: 756927, seat: 1, perc: .24, veh: 1080 } }
+           ,{ title: 'Ohio', tooltip: 'Ohio', type: 'folder', key: '/Ohio', attributes: { capital: 'Columbus', pop: 11613423, seat: 16, perc: 3.61, veh: 910 } }
+           ,{ title: 'Oklahoma', tooltip: 'Oklahoma', type: 'folder', key: '/Oklahoma', attributes: { capital: 'Oklahoma City', pop: 3911338, seat: 5, perc: 1.22, veh: 860 } }
+           ,{ title: 'Oregon', tooltip: 'Oregon', type: 'folder', key: '/Oregon', attributes: { capital: 'Salem', pop: 4028977, seat: 5, perc: 1.25, veh: 770 } }
+           ,{ title: 'Pennsylvania', tooltip: 'Pennsylvania', type: 'folder', key: '/Pennsylvania', attributes: { capital: 'Harrisburg', pop: 12802503, seat: 18, perc: 3.98, veh: 760 } }
+           ,{ title: 'Rhode Island', tooltip: 'Rhode Island', type: 'folder', key: '/Rhode Island', attributes: { capital: 'Providence', pop: 1056298, seat: 2, perc: .33, veh: 730 } }
+           ,{ title: 'South Carolina', tooltip: 'South Carolina', type: 'folder', key: '/South Carolina', attributes: { capital: 'Columbia', pop: 4896146, seat: 7, perc: 1.52, veh: 770 } }
+           ,{ title: 'South Dakota', tooltip: 'South Dakota', type: 'folder', key: '/South Dakota', attributes: { capital: 'Pierre', pop: 858469, seat: 1, perc: .27, veh: 950 } }
+           ,{ title: 'Tennessee', tooltip: 'Tennessee', type: 'folder', key: '/Tennessee', attributes: { capital: 'Nashville', pop: 6600299, seat: 9, perc: 2.05, veh: 840 } }
+           ,{ title: 'Texas', tooltip: 'Texas', type: 'folder', key: '/Texas', attributes: { capital: 'Austin', pop: 27469114, seat: 36, perc: 8.55, veh: 720 } }
+           ,{ title: 'Utah', tooltip: 'Utah', type: 'folder', key: '/Utah', attributes: { capital: 'Salt Lake City', pop: 2995919, seat: 4, perc: .93, veh: 870 } }
+           ,{ title: 'Vermont', tooltip: 'Vermont', type: 'folder', key: '/Vermont', attributes: { capital: 'Montpelier', pop: 626042, seat: 1, perc: .19, veh: 910 } }
+           ,{ title: 'Virginia', tooltip: 'Virginia', type: 'folder', key: '/Virginia', attributes: { capital: 'Richmond', pop: 8382993, seat: 11, perc: 2.61, veh: 840 } }
+           ,{ title: 'Washington', tooltip: 'Washington', type: 'folder', key: '/Washington', attributes: { capital: 'Olympia', pop: 7170351, seat: 10, perc: 2.23, veh: 870 } }
+           ,{ title: 'West Virginia', tooltip: 'West Virginia', type: 'folder', key: '/West Virginia', attributes: { capital: 'Charleston', pop: 1844128, seat: 3, perc: .57, veh: 750 } }
+           ,{ title: 'Wisconsin', tooltip: 'Wisconsin', type: 'folder', key: '/Wisconsin', attributes: { capital: 'Madison', pop: 5771337, seat: 8, perc: 1.80, veh: 860 } }
+           ,{ title: 'Wyoming', tooltip: 'Wyoming', type: 'folder', key: '/Wyoming', attributes: { capital: 'Cheyenne', pop: 586107, seat: 1, perc: .18, veh: 1140 } }
         ]
     }
 });
