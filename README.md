@@ -31,3 +31,5 @@ These blocks fit into the following 5 categories:
 >
 
 Documentation: https://ioneyez.github.io/pdmk/helpcontent.html
+
+> SEE LICENSE-MIT CONTRIBUTION-NOTICE AND CREDITS FOR LEGAL DETAILS
