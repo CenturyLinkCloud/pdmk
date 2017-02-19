@@ -58,6 +58,18 @@ Plastic.RegisterDatastore({
                ,attributes: {
                     preinlinehelp: '<div style="font-style:normal;">' + //->
                         '<div class="plastic-form-title" style="margin-top:0px;text-align:left;">' + //->
+                        'Help Topics - The [pdmk] Basics - ' + //->
+                        '<a style="float:right;padding:10px;color:#197771;font-size:20px;font-weight:bold;border-radius:5px;' + //->
+                        '    box-shadow:2px 2px 8px 4px #6699aa;cursor:pointer;text-decoration:none;margin:-12px 0px;' + //->
+                        '    background-color:#4fcfaf;border:solid #197771 2px;" title="1.0.0b &quot;Epoxy&quot;"' + //->
+                        '    href="releases/pdmk-1.0.0b.zip">Download [pdmk]</a>' + //->
+                        '</div>' + //->
+                        '<p>We proudly introduce to you the [pdmk] toolkit. This main page provides answers to basic questions ' + //->
+                        'about [pdmk]. Once you\'ve determined [pdmk] may be the right toolkit for your needs please feel ' + //->
+                        'free to browse other [pdmk] related help topics by selecting from the options on the left.</p>' + //->
+                        '<p>We highly recommend checking out our video tutorial in the <span activate="start">Getting Started</span> ' + //->
+                        'section which will walk you through building a simple [pdmk] application.</p>' + //->
+                        '<div class="plastic-form-title" style="text-align:left;">' + //->
                         'What is [pdmk] ?</div>' + //->
                         '<p>The [pdmk] toolkit provides an easy way to build rich graphical applications backed ' + //->
                         'by variety of data sources in a matter of days, not months. It is written in 100% native ' + //->
@@ -74,22 +86,22 @@ Plastic.RegisterDatastore({
                         '<p>Any application where its primary function is working with data. At first glance this might seem ' + //->
                         'to be a fairly short list but given some thought on the matter one can see this solution ' + //->
                         'actually fits a <u>lot</u> of needs.</p>' + //->
-                        '<p>Some examples might be:<ul style="list-style-type:circle;">' + //->
-                        '<li style="font-weight:bold;">Travel Reservation</li>' + //->
+                        '<p>Some examples might be:<ul style="list-style-type:none;">' + //->
+                        '<li style="font-weight:bold;margin:0px 0px 5px -20px;">Travel Reservation</li>' + //->
                         'Airline and hotel reservation systems typically interact with a lot of data. From availability and amenities ' + //->
                         'to local restaurants and entertainment [pdmk] can track and allow users to quickly and easily interact with ' + //->
                         'all these data sources.' + //->
-                        '<li style="font-weight:bold;">Customer Relationship Management (CRM)</li>' + //->
+                        '<li style="font-weight:bold;margin:10px 0px 3px -20px;">Customer Relationship Management (CRM)</li>' + //->
                         'CRM software can be a salesperson\'s best tool. Building a CRM application can empower a small sales force ' + //->
                         'to move quickly and stay focused on what is important for the business to be successful.' + //->
-                        '<li style="font-weight:bold;">Selling Goods or Services</li>' + //->
+                        '<li style="font-weight:bold;margin:10px 0px 3px -20px;">Selling Goods or Services</li>' + //->
                         'This is probably an obvious example. Presenting and allowing users to select and purchase goods and ' + //->
                         'services can be done simply and effectively. Additionally, tracking products and local inventory ' + //->
                         'can be integrated into the "user experience" for a more positive result.' + //->
-                        '<li style="font-weight:bold;">Journal or Blog Entries</li>' + //->
+                        '<li style="font-weight:bold;margin:10px 0px 3px -20px;">Journal or Blog Entries</li>' + //->
                         'Yes [pdmk] can function as a content management system (CMS) tracking and presenting content in a ' + //->
                         'consistent and uniform flow.' + //->
-                        '<li style="font-weight:bold;">Etc.</li>' + //->
+                        '<li style="font-weight:bold;margin:10px 0px 3px -20px;;">Etc.</li>' + //->
                         'As you can see, once the problem of building the application is shifted to one of data management ' + //->
                         'a lot of opportunities open up.' + //->
                         '</ul></p>' + //->
@@ -124,7 +136,8 @@ Plastic.RegisterDatastore({
                         'What\'s up with the name ?</div>' + //->
                         '<p>"Plastic Data Modeling Kit" [pdmk] comes from how flexible all of the components are and the ' + //->
                         'way applications are built. Plastic Data can be easily molded or adapted to any shape ' + //->
-                        'and this toolkit allows one to assemble applications similar to plastic car or airplane model kit.</p>' + //->
+                        'and this toolkit allows one to assemble applications similar to a plastic car or ' + //->
+                        'airplane model kit.</p>' + //->
                         '<div style="position:relative;">' + //->
                         '<img src="images/plastic-information.png" ' + //->
                              'style="position:absolute;width:30px;height:30px;top:-5px;right:-5px;">' + //->
@@ -152,8 +165,7 @@ Plastic.RegisterDatastore({
                ,attributes: {
                     preinlinehelp: '<div style="font-style:normal;">' + //->
                         '<div class="plastic-form-title" style="margin-top:0px;">' + //->
-                        'Introduction to Plastic Data Modeling Kit <nobr>[<img src="images/pdmklogo_plainback01_sm.png" ' + //->
-                        'style="vertical-align:middle;" title="Plastic Data Modeling Kit">]</nobr></div>' + //->
+                        'Introduction to Plastic Data Modeling Kit [pdmk]</div>' + //->
                         '<div style="text-align:right;"><span activate="help">&lt;&lt; Back to Help Topics</span></div>' + //->
                         'The [pdmk] toolkit provides the ability to easily model (fashion or shape) ' + //->
                         'data as if it were made of plastic.  It does this by providing common layout, ' + //->
@@ -180,8 +192,7 @@ Plastic.RegisterDatastore({
                ,attributes: {
                     preinlinehelp: '<div style="font-style:normal;">' + //->
                         '<div class="plastic-form-title" style="margin-top:0px;">' + //->
-                        'Getting Started With <nobr>[<img src="images/pdmklogo_plainback01_sm.png" ' + //->
-                        'style="vertical-align:middle;" title="Plastic Data Modeling Kit">]</nobr></div>' + //->
+                        'Getting Started With [pdmk]</div>' + //->
                         'The easiest way to get started with [pdmk] is to dive right in and take one of ' + //->
                         '<span activate="examples">JSFiddle Examples</span> for a spin. The ' + //->
                         '<span activate="examples-context">Context Menu Example</span> demonstrates ' + //->
@@ -195,7 +206,7 @@ Plastic.RegisterDatastore({
                         '<pre class="prettyprint linenums">\n' + //->
                         '&lt;script src="https://ioneyez.github.io/pdmk/scripts/pdmk-min.js" type="text/javascript"&gt;&lt;/script&gt;\n' + //->
                         '&lt;link  href="https://ioneyez.github.io/pdmk/style/pdmk-min.css" rel="stylesheet" type="text/css"&gt;\n\n' + //->
-                        '&lt;!-- Optional "Demo" Datastore --&gt;\n' + //->
+                        '&lt;!-- Optional Demo Datastores --&gt;\n' + //->
                         '&lt;script src="https://ioneyez.github.io/pdmk/scripts/PlasticDatastoreHelp.js" type="text/javascript"&gt;&lt;/script&gt;\n' + //->
                         '</pre><br>' + //->
                         'To help get you on your way, take a quick look at our video tutorial:<br><br>' + //->
@@ -232,8 +243,7 @@ Plastic.RegisterDatastore({
                ,attributes: {
                     preinlinehelp: '<div style="font-style:normal;">' + //->
                         '<div class="plastic-form-title" style="margin-top:0px;">' + //->
-                        'The Datastore Object <nobr>[<img src="images/pdmklogo_plainback01_sm.png" ' + //->
-                        'style="vertical-align:middle;" title="Plastic Data Modeling Kit">]</nobr></div>' + //->
+                        'The Datastore Object [pdmk]</div>' + //->
                         '<div style="text-align:right;"><span activate="introduction">&lt;&lt; Back to Introduction</span></div>' + //->
                         'The pdmk Datastore is a Javascript Object providing common methods for ' + //->
                         'easily interacting with its underlying data (Create, Read, Update, Delete ' + //->
@@ -368,8 +378,7 @@ Plastic.RegisterDatastore({
                    ,attributes: {
                         preinlinehelp: '<div style="font-style:normal;">' + //->
                             '<div class="plastic-form-title" style="margin-top:0px;">' + //->
-                            'The rowObject Structure <nobr>[<img src="images/pdmklogo_plainback01_sm.png" ' + //->
-                            'style="vertical-align:middle;" title="Plastic Data Modeling Kit">]</nobr></div>' + //->
+                            'The rowObject Structure [pdmk]</div>' + //->
                             '<div style="text-align:right;"><span activate="datastore">&lt;&lt; Back to Datastore</span></div>' + //->
                             'The pdmk <span activate="datastore">Datastore</span> provides a heirarchical array of rowObjects. These ' + //->
                             'rowObjects are JavaScript Objects containing references to these ' + //->
@@ -414,9 +423,7 @@ Plastic.RegisterDatastore({
                ,attributes: {
                     preinlinehelp: '<div style="font-style:normal;">' + //->
                         '<div class="plastic-form-title" style="margin-top:0px;">' + //->
-                        'The <nobr>[<img src="images/pdmklogo_plainback01_sm.png" ' + //->
-                        'style="vertical-align:middle;" title="Plastic Data Modeling Kit">]</nobr> ' + //->
-                        'Component Classes</div>' + //->
+                        'The [pdmk] Component Classes</div>' + //->
                         '<div style="text-align:right;"><span activate="introduction">&lt;&lt; Back to Introduction</span></div>' + //->
                         'The Stack component class provides geometry and layout management components ' + //->
                             'or "where" and "when" view and widget components are displayed.  Example ' + //->
@@ -1382,17 +1389,19 @@ Plastic.RegisterDatastore({
                         '    Chief Software Architect - John Woodworth &lt;john.woodworth@centurylink.com&gt;\n\n' + //->
                         '  Design -\n\n' + //->
                         '    Chief Software Architect - John Woodworth &lt;john.woodworth@centurylink.com&gt;\n' + //->
-                        '    Software Consultant - Dean Ballew &lt;dean.ballew@centurylink.com&gt;\n' + //->
-                        '    Graphical Consultant - Shashwath Bindinganaveli Raghavan\n\n' + //->
+                        '    Software Integration Consultant - Dean Ballew &lt;dean.ballew@centurylink.com&gt;\n' + //->
+                        '    Graphical Interface Consultant - Shashwath Bindinganaveli Raghavan\n\n' + //->
                         '  Development -\n\n' + //->
-                        '    Lead Software Developer - John Woodworth &lt;john.woodworth@centurylink.com&gt;\n' + //->
-                        '    Playbook Consultant - Dean Ballew &lt;dean.ballew@centurylink.com&gt;\n\n' + //->
+                        '    Chief Software Architect - John Woodworth &lt;john.woodworth@centurylink.com&gt;\n' + //->
+                        '    Lead Playbook Consultant - Dean Ballew &lt;dean.ballew@centurylink.com&gt;\n\n' + //->
                         '  Testing -\n\n' + //->
-                        '    Chief Test Architect - Dean Ballew &lt;dean.ballew@centurylink.com&gt;\n' + //->
-                        '    Test Architect - Shashwath Bindinganaveli Raghavan\n\n' + //->
+                        '    Test Architect/ Consultant - Shashwath Bindinganaveli Raghavan\n\n' + //->
+                        '  End User Enablement -\n\n' + //->
+                        '    Chief Systems Integrator - John Woodworth &lt;john.woodworth@centurylink.com&gt;\n' + //->
+                        '    Chief End User Integrator - Dean Ballew &lt;dean.ballew@centurylink.com&gt;\n\n' + //->
                         '  Official [pdmk] Code Maintainers -\n\n' + //->
                         '    Chief Software Architect - John Woodworth &lt;john.woodworth@centurylink.com&gt;\n' + //->
-                        '    Playbook Consultant - Dean Ballew &lt;dean.ballew@centurylink.com&gt;\n' + //->
+                        '    Chief End User Integrator - Dean Ballew &lt;dean.ballew@centurylink.com&gt;\n\n' + //->
                         '</pre>\n' + //->
                         '</div>\n'
                 }

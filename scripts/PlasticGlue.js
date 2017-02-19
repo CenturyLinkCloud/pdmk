@@ -11,7 +11,7 @@
 / Support Contact: plastic@centurylink.com
 /
 / Created: 04 January, 2014
-/ Last Updated: 10 February, 2016
+/ Last Updated: 17 December, 2016
 /
 / VERSION: 1.0.0b
 /
@@ -63,12 +63,84 @@
     $.fn.plasticDataSorter = function(dataKey) { 
         return this.sort(function(a,b){$(a).data(dataKey)-$(b).data(dataKey)});
     };
+    $.each(['show', 'hide'], function(index, name){ // Add triggers for show and hide
+        var origFunction = $.fn[name];
+        $.fn[name] = function(speed) {
+            return origFunction.apply(this, arguments).trigger(name + '.plastic');
+        };
+    });
+    // ** http://stepansuvorov.com/blog/2014/04/jquery-put-and-delete/ ** //
+    // ** http://stackoverflow.com/questions/11793430/retry-a-jquery-ajax-request-which-has-callbacks-attached-to-its-deferred ** //
+    $.each(['post', 'get', 'put', 'delete'], function(index, name){ // Add/ Replace CRUD functions for ajax calls
+        $[name] = function( url, data, callback, type ) {
+            if ($.isFunction( data )) {
+                type = type || callback;
+                callback = data;
+                data = undefined;
+            }
+            var request = {
+                url: url
+               ,type: name.toUpperCase()
+               ,dataType: type
+               ,data: data
+               ,success: function() {
+                    Plastic.Authenticated.call(this);
+                    if ($.isFunction( callback )) {
+                        callback.apply(this, Array.prototype.slice.call(arguments));
+                    }
+                }
+            },
+            jqXHR = undefined,
+            deferredFail = undefined,
+            deferred = $.Deferred();
+            deferredFail = function() {
+                var args = Array.prototype.slice.call(arguments);
+                var util = Plastic.Util('Authentication');
+                if ((jqXHR.status === 401) && (deferredFail.fails++ < 10)) {
+                    var rStatus = util.getStatus.call(jqXHR, request);
+                    var aChallenge = util.getChallenge.call(jqXHR, request);
+                    var thisMessage = ((request) && (request.headers) && (request.headers.Authorization)) //->
+                        ? ((rStatus) && (rStatus.message)) //->
+                            ? ((aChallenge) && (aChallenge.realm)) //->
+                                ? rStatus.message.replace(/\.$/, '') + ': [ ' + aChallenge.realm + ' ]' //->
+                                : rStatus.message //->
+                            : ((aChallenge) && (aChallenge.realm)) //->
+                                ? 'Credentials failed to access resource: [ ' + aChallenge.realm + ' ]' //->
+                                : 'Credentials failed to access resource.' //->
+                        : ((aChallenge) && (aChallenge.realm)) //->
+                            ? 'Login credentials are requested for this application: [ ' + aChallenge.realm + ' ]' //->
+                            : 'Login credentials are requested for this application';
+                    Plastic.Feedback.call(this, '<span class="plastic-system-feedback-title">' + jqXHR.statusText  + //->
+                        ':</span>' + thisMessage, 'warning', undefined, undefined, { decay: 10, force: true })
+                    Plastic.Authenticate.call(jqXHR, request, function(fopts){
+                        jqXHR = $.ajax(request);
+                        jqXHR.then(deferred.resolve, deferredFail);
+                    });
+                } else {
+                    deferred.rejectWith(jqXHR, args);
+                }
+            };
+            deferredFail.fails = 0;
+            jqXHR = $.ajax(request).done(deferred.resolve).fail(deferredFail);
+            return deferred.promise(jqXHR);
+        };
+    });
 })(jQuery);
 
 (function (_,$) { /* window, jQuery */
     // Define Debugging Configuration and Handler
     _._PlasticRuntime = {};
-    _._PlasticPrefs = $.extend({}, { BugPriority: 0, BugCategory: /^none$/i }, _._PlasticPrefs);
+    _._PlasticPrefs = $.extend({}, {
+        BugPriority: 0
+       ,BugCategory: /^none$/i
+       ,AuthUserCookie: 'PDMK_USER'
+       ,AuthUserPattern: /^.{8}.*$/
+       ,AuthPassPattern: /^.{8}.*$/
+       ,FeedbackIgnoreCookie: 'PDMK_FBIGNORE'
+       ,FeedbackIgnore: /^()$/
+       ,FeedbackIconCookie: 'PDMK_FBICON'
+       ,FeedbackIconOnly: /^(information|success)$/
+    }, _._PlasticPrefs);
     _._PlasticBug = function(message, priority, category, level) {
         // Priority: Higher == More Verbose
         // Category: Restrict Messages By Categories (RegExp)
@@ -120,9 +192,58 @@
     // Create Main "Plastic" Object
     _.Plastic = new function(){
         var readyStack = [];
-        this.version = '1.0.0';
-        this.release = 'Public Beta';
+        this.version = '1.0.0b1';
+        this.release = 'Public Beta [Epoxy]';
         this.ready = function(retFunction) { readyStack.push([this, retFunction]); };
+        this.Cookie = function(name, value, path, expire) { // Basic Cookie Management
+            var retVal = undefined;
+            if (name !== null) { // Name Flag To Ignore Cookies
+                if (value !== undefined) { // Write
+                    var thisCookie = name + '=' + value.replace(/;/g, '%3B');
+                    thisCookie += (path !== undefined) //->
+                        ? '; Path=' + path //->
+                        : (_PlasticPrefs.CookieBase !== undefined) //->
+                            ? '; Path=' + _PlasticPrefs.CookieBase //->
+                            : '';
+                    thisCookie += (expire !== undefined) ? '; Expires=' + new Date(expire).toUTCString() : '';
+                    document.cookie = thisCookie;
+                } else {
+                    var cookies = document.cookie.split(/;\s+/);
+                    for (var cntCookie = 0; cntCookie < cookies.length; cntCookie ++) {
+                        var cPart = cookies[cntCookie].split(/=/);
+                        var thisName = cPart.shift();
+                        if (thisName === name) {
+                            retVal = cPart.join('=').replace(/%3B/ig, ';');
+                        }
+                    }
+                }
+            }
+            return retVal;
+        };
+        this.Authenticated = function(request, fopts) {
+            $('.plastic-commit-pane').removeClass('plastic-not-authenticated').hide();
+        };
+        this.Authenticate = function(request, retFunction, fopts) {
+            var jqXHR = this;
+            var util = Plastic.Util('Authentication');
+            var userTry = Plastic.Cookie(_PlasticPrefs.AuthUserCookie);
+            $('#plastic-auth-user').val((userTry !== undefined) ? userTry : '');
+            $('.plastic-commit-pane').addClass('plastic-not-authenticated').show();
+            $('#plastic-auth-signon').one('click', function(){
+                $('.plastic-commit-pane').removeClass('plastic-not-authenticated');
+                if ((retFunction !== undefined) && (typeof (retFunction) === 'function')) {
+                    var fopts = {};
+                    var thisUser = $('#plastic-auth-user').val(), thisPass = $('#plastic-auth-pass').val();
+                    Plastic.Cookie(_PlasticPrefs.AuthUserCookie, thisUser); // Cache As Session Cookie
+                    ////$('#plastic-auth-pass').val(''); // Clear Previous Password?? (FindMe!!)
+                    var aResponse = util.getResponse.call(jqXHR, request, thisUser, thisPass);
+                    request.headers = { Authorization: aResponse.header };
+                    retFunction.call(jqXHR, fopts);
+                } else {
+                    _PlasticBug('WARN: Invalid Plastic.Authenticate callback specified', 2);
+                }
+            });
+        };
         this.RegisterPlaybook = function(playbook, fopts) {
             _PlasticBug("Plastic.RegisterPlaybook(playbook); called", 4, 'function');
             _PlasticBug(playbook, 4, 'comment');
@@ -138,81 +259,39 @@
             _PlasticBug(datastore, 4, 'comment');
             if (_PlasticRuntime.datastore === undefined) { _PlasticRuntime.datastore = {}; };
             var pds = _PlasticRuntime.datastore;
+            var legal = {
+                fns: [
+                    'createRowHandler', 'readRowHandler', 'updateRowHandler', 'deleteRowHandler', //->
+                    'commitRowHandler', 'searchRowHandler', 'authenticateHandler', //->
+                    'securityContextHandler', 'syntaxRowHandler'
+                ]
+               ,opts: [
+                    'anchor', 'commit', 'rowDefault', 'includeRoot', 'trimDelimiter', //->
+                    'delimiter', 'rootRowObject', 'augment', 'type', 'attributes', //->
+                    'selected', 'dateFormat', 'prettyNames'
+                ]
+            };
             for (var dsname in datastore) {
+                if (dsname.substr(0, 1) === '_') { continue; }; // Skip Special-Use Datastores
                 if (pds[dsname] === undefined) {
                     pds[dsname] = new PlasticDatastore(dsname, { data: datastore[dsname].data });
                     _PlasticBug('New PlasticDatastore created: ' + dsname, 4, 'comment');
-                    // Roll These IFs into Switch?? (FindMe!!)
-                    if (typeof (datastore[dsname].createRowHandler) === "function") {
-                        pds[dsname].createRowHandler = datastore[dsname].createRowHandler;
-                        _PlasticBug('Custom createRowHandler defined: ' + dsname, 4, 'comment');
+                    for (var cntFn = 0; cntFn < legal.fns.length; cntFn ++) {
+                        if (typeof (datastore[dsname][legal.fns[cntFn]]) === "function") {
+                            pds[dsname][legal.fns[cntFn]] = datastore[dsname][legal.fns[cntFn]];
+                            _PlasticBug('Custom ' + [legal.fns[cntFn]] + ' defined: ' + dsname, 4, 'comment');
+                        } else if (('_default' in datastore) && (legal.fns[cntFn] in datastore['_default']) && //->
+                                (typeof (datastore['_default'][legal.fns[cntFn]]) === "function")) {
+                            pds[dsname][legal.fns[cntFn]] = datastore['_default'][legal.fns[cntFn]];
+                            _PlasticBug('Custom ' + [legal.fns[cntFn]] + ' defined by default: ' + dsname, 4, 'comment');
+                        }
                     }
-                    if (typeof (datastore[dsname].readRowHandler) === "function") {
-                        pds[dsname].readRowHandler = datastore[dsname].readRowHandler;
-                        _PlasticBug('Custom readRowHandler defined: ' + dsname, 4, 'comment');
-                    }
-                    if (typeof (datastore[dsname].updateRowHandler) === "function") {
-                        pds[dsname].updateRowHandler = datastore[dsname].updateRowHandler;
-                        _PlasticBug('Custom updateRowHandler defined: ' + dsname, 4, 'comment');
-                    }
-                    if (typeof (datastore[dsname].deleteRowHandler) === "function") {
-                        pds[dsname].deleteRowHandler = datastore[dsname].deleteRowHandler;
-                        _PlasticBug('Custom deleteRowHandler defined: ' + dsname, 4, 'comment');
-                    }
-                    if (typeof (datastore[dsname].commitRowHandler) === "function") {
-                        pds[dsname].commitRowHandler = datastore[dsname].commitRowHandler;
-                        _PlasticBug('Custom commitRowHandler defined: ' + dsname, 4, 'comment');
-                    }
-                    if (typeof (datastore[dsname].searchRowHandler) === "function") {
-                        pds[dsname].searchRowHandler = datastore[dsname].searchRowHandler;
-                        _PlasticBug('Custom searchRowHandler defined: ' + dsname, 4, 'comment');
-                    }
-                    if (typeof (datastore[dsname].requestSecurityContextHandler) === "function") {
-                        pds[dsname].requestSecurityContextHandler = datastore[dsname].requestSecurityContextHandler;
-                        _PlasticBug('Custom requestSecurityContextHandler defined: ' + dsname, 4, 'comment');
-                    }
-                    if (typeof (datastore[dsname].syntaxRowHandler) === "function") {
-                        pds[dsname].syntaxRowHandler = datastore[dsname].syntaxRowHandler;
-                        _PlasticBug('Custom syntaxRowHandler defined: ' + dsname, 4, 'comment');
-                    }
-                    if (datastore[dsname].anchor) {
-                        pds[dsname].option('anchor', datastore[dsname].anchor);
-                    }
-                    if (datastore[dsname].commit) {
-                        pds[dsname].option('commit', datastore[dsname].commit);
-                    }
-                    if (datastore[dsname].rowDefault) {
-                        pds[dsname].option('rowDefault', datastore[dsname].rowDefault);
-                    }
-                    if (datastore[dsname].includeRoot) {
-                        pds[dsname].option('includeRoot', datastore[dsname].includeRoot);
-                    }
-                    if (datastore[dsname].trimDelimiter) {
-                        pds[dsname].option('trimDelimiter', datastore[dsname].trimDelimiter);
-                    }
-                    if (datastore[dsname].delimiter) {
-                        pds[dsname].option('delimiter', datastore[dsname].delimiter);
-                    }
-                    if (datastore[dsname].rootRowObject) {
-                        pds[dsname].option('rootRowObject', datastore[dsname].rootRowObject);
-                    }
-                    if (datastore[dsname].augment) {
-                        pds[dsname].option('augment', datastore[dsname].augment);
-                    }
-                    if (datastore[dsname].type) {
-                        pds[dsname].option('type', datastore[dsname].type);
-                    }
-                    if (datastore[dsname].attributes) {
-                        pds[dsname].option('attributes', datastore[dsname].attributes);
-                    }
-                    if (datastore[dsname].selected) {
-                        pds[dsname].option('selected', datastore[dsname].selected);
-                    }
-                    if (datastore[dsname].dateFormat) {
-                        pds[dsname].option('dateFormat', datastore[dsname].dateFormat);
-                    }
-                    if (datastore[dsname].prettyNames) {
-                        pds[dsname].option('prettyNames', datastore[dsname].prettyNames);
+                    for (var cntOpt = 0; cntOpt < legal.opts.length; cntOpt ++) {
+                        if (legal.opts[cntOpt] in datastore[dsname]) {
+                            pds[dsname].option(legal.opts[cntOpt], datastore[dsname][legal.opts[cntOpt]]);
+                        } else if (('_default' in datastore) && (legal.opts[cntOpt] in datastore['_default'])) {
+                            pds[dsname].option(legal.opts[cntOpt], datastore['_default'][legal.opts[cntOpt]]);
+                        }
                     }
                 } else {
                     ///throw new Error("PlasticDatastore already exists with name '" + dsname + "'");
@@ -228,7 +307,14 @@
             if (_PlasticRuntime.root === undefined) { // Define "root" anchor element
                 _PlasticRuntime.root = parent;
                 // Initialize Root And Loading Classes
+    // Enable qUnit Features if Libraries are Available
+    if ($('#qunit').length === 0) {
+        $('body').append($('<div id="qunit" /><div id="qunit-fixture" />'));
+    }
                 $(_PlasticRuntime.root).addClass('plastic-root plastic-loading');
+                if ((document.all) || (/rv:11\./.test(navigator.userAgent))) { // wIErdness Fix :)
+                    $(_PlasticRuntime.root).addClass('plastic-browser-msie');
+                }
                 _PlasticRuntime.imgbase = $('.plastic-root').css('background-image').replace(/^[^(]*\("|[^/]*$/g, '');
             };
             var parts = [];
@@ -280,6 +366,174 @@
                     }
                 }
             }
+        };
+        this.Util = function(category) {
+            var retVal = undefined;
+            switch (category) {
+                case 'Authentication':
+                    retVal = {
+                        _field_values: function(scheme, items, qStrings) {
+                            var thisRet = {};
+                            thisRet[scheme] = {};
+                            for (var cntItems = 0; cntItems < items.length; cntItems ++) {
+                                if (/^[A-Za-z0-9!#$%&'*+.^_`|~-]+=\1$/.test(items[cntItems])) {
+                                    // Is Quoted String Pair
+                                    thisRet[scheme][items[cntItems].replace(/=.*$/, '')] = //->
+                                        qStrings.shift().replace(/\1/g, '"');
+                                } else if (/^[A-Za-z0-9!#$%&'*+.^_`|~-]+=[A-Za-z0-9!#$%&'*+.^_`|~-]+$/.test(items[cntItems])) {
+                                    // Is Token Pair
+                                    thisRet[scheme][items[cntItems].replace(/=.*$/, '')] = //->
+                                        items[cntItems].replace(/^.*=/, '');
+                                } else if ((items.length === 1) && (/^[A-Za-z0-9!#$%&'*+.^_`|~-]+$/.test(items[cntItems]))) {
+                                    // Is Single Token Value, Special Key Of '>' Used
+                                    thisRet[scheme]['>'] = items[cntItems];
+                                } else {
+                                    // Bad Item Value (FindMe!!)
+                                }
+                            }
+                            if ('data' in thisRet[scheme]) {
+                                try {
+                                    var decoded = atob(thisRet[scheme].data); // Assume "atob" Exists Native or Is PollyFilled
+                                    decoded = JSON.parse(decoded); // Assume Clean Base64 Decode
+                                    delete (thisRet[scheme].data);
+                                    for (var thisElem in decoded) {
+                                        thisRet[scheme][thisElem] = decoded[thisElem];
+                                    }
+                                } catch (err) {
+                                    _PlasticBug('WARN: Unable to parse auth options -- ' + err.message, 2);
+                                }
+                            }
+                            return thisRet;
+                        }
+                       ,_field_parser: function(action, qStrings) {
+                            var scheme = undefined, items = [], thisRet = undefined;
+                            while (action.length) {
+                                var thisPart = action.shift();
+                                if (scheme === undefined) {
+                                    scheme = thisPart;
+                                } else {
+                                    if ((items.length === 0) || (action.length === 0) || //->
+                                        (/(,$|=)/.test(thisPart))) {
+                                        items[items.length] = thisPart.replace(/,$/, '');
+                                    } else { // NOTE: Must Process All Fields To Keep qStrings In Sync
+                                        var values = retVal._field_values(scheme, items, qStrings);
+                                        if (scheme === '|pdmk|') { // Make Configurable?? (FindMe!!)
+                                            thisRet = values;
+                                            break;
+                                        }
+                                        scheme = thisPart;
+                                        items = [];
+                                    }
+                                }
+                            }
+                            if ((scheme === '|pdmk|') && (items.length)) { // Make Configurable?? (FindMe!!)
+                                thisRet = retVal._field_values(scheme, items, qStrings);
+                            }
+                            return thisRet;
+                        }
+                       ,_hash: function(algorithm, bits, data) { // Wrapper for Current Hash Library (jsSHA)
+                            var fopts = $.extend({}, { "shakeLen" : bits });
+                            var hash = new jsSHA(algorithm, "TEXT");
+                            hash.update(data);
+                            return hash.getHash("HEX", fopts);
+                        }
+                       ,getChallenge: function(request){
+                            var jqXHR = this;
+                            var thisRet = undefined;
+                            var qStrings = [];
+                            var challenge = jqXHR.getResponseHeader('WWW-Authenticate');
+                            // ASCII SOH Character Borrowed For Simplicity
+                            // NOTE: Escaped-Quotes SHOULD Only Appear Within Real Quotes
+                            challenge = challenge.replace(/\1/g, '').replace(/\\\"/g, '\1') //->
+                                .replace(/"[^"]*"/g, function(match){
+                                qStrings[qStrings.length] = match.replace(/^"|"$/g, '');
+                                return '\1';
+                            }).split(/[\s]+/); // Finally, Create Array Of Tokens
+                            challenge = retVal._field_parser(challenge, qStrings);
+                            thisRet = ((challenge) && (challenge['|pdmk|'])) ? challenge['|pdmk|'] : {};
+                            return thisRet;
+                        }
+                       ,getResponse: function(request, user, pass){
+                            var jqXHR = this;
+                            var thisRet = undefined;
+                            var aChallenge = retVal.getChallenge.call(jqXHR, request);
+                            var aResponse = {};
+                            aResponse.user = user;
+                            aResponse.nonce = aChallenge.nonce;
+                            aResponse.opaque = aChallenge.opaque;
+                            aResponse.type = aChallenge.type;
+                            var algorithms = (typeof (aChallenge.algorithms) === 'string') //->
+                                ? aChallenge.algorithms.split('|') : [];
+                            aResponse.aweight = -1; // Target Most Preferred Algorithm
+                            while (algorithms.length) {
+                                var thisAlg = algorithms.shift().toUpperCase();
+                                var weight = 0;
+                                switch (thisAlg) {
+                                    case "SHAKE256": // Preferred Algorithms Above Lesser Preferred
+                                        weight += 1;
+                                    case "SHAKE128":
+                                        weight += 1;
+                                        aResponse.bitLength = 1024;
+                                    case "SHA3-512":
+                                        weight += 1;
+                                    case "SHA-512":
+                                        weight += 1;
+                                    case "SHA3-384":
+                                        weight += 1;
+                                    case "SHA-384":
+                                        weight += 1;
+                                    case "SHA3-256":
+                                        weight += 1;
+                                    case "SHA-256":
+                                        weight += 1;
+                                    case "SHA3-224":
+                                        weight += 1;
+                                    case "SHA-224":
+                                        weight += 1;
+                                    case "SHA-1":
+                                        weight += 1;
+                                        if ((weight > 0) && (weight > aResponse.aweight)) {
+                                            aResponse.algorithm = thisAlg;
+                                            aResponse.aweight = weight;
+                                        }
+                                        break;
+                                    default:
+                                        aResponse.error = 'Unable to negotiate a secure algorithm for authenticating against server';
+                                };
+                            }
+                            if ('algorithm' in aResponse) {
+                                delete (aResponse.aweight); // No Longer Needed
+                                aResponse.tokenRaw = [aResponse.algorithm, aResponse.bitLength, aResponse.user, aResponse.nonce, aResponse.algorithm, aResponse.bitLength, pass];
+                                aResponse.token = retVal._hash(aResponse.algorithm, aResponse.bitLength, //->
+                                    aResponse.user + ':' + aResponse.nonce + ':' + //->
+                                    retVal._hash(aResponse.algorithm, aResponse.bitLength, pass));
+                                try {
+                                    var encoded = JSON.stringify(aResponse);
+                                    encoded = btoa(encoded); // Assume "btoa" Exists Native or Is PollyFilled
+                                    thisRet = { 'data' : aResponse, 'header' : '|pdmk| data="'+ encoded +'"' };
+                                } catch (err) {
+                                    _PlasticBug('WARN: Unable to parse auth options -- ' + err.message, 2);
+                                }
+                            } else {
+                            }
+                            return thisRet;
+                        }
+                       ,getStatus: function(request){
+                            var jqXHR = this;
+                            var thisRet = undefined;
+                            try {
+                                var thisStatus = JSON.parse(jqXHR.responseText);
+                                thisRet = thisStatus.status;
+                            } catch (err) { // Do something?? (FindMe!!)
+                            }
+                            return thisRet;
+                        }
+                    };
+                    break;
+                default:
+                    retVal = {};
+            };
+            return retVal;
         };
         this.SizeFrame = function(e) {
             var thisHeight = parseInt($(this).height());
@@ -358,15 +612,15 @@
                     if ((datastore) && (path) && (path === '-')) { // Previous Datastore rowObject
                         var findPrevHop = function(thisRowObject) { // Roll this into Datastore Method (FindMe!!)
                             var prevHop = null;
-                            thisRowObject = datastore.readCache(thisRowObject.prev);
+                            thisRowObject = datastore.readCache(thisRowObject.prev, fopts);
                             if ((thisRowObject !== null) && (thisRowObject.firstChild)) {
                                 while (thisRowObject.firstChild) {
-                                    thisRowObject = datastore.readCache(thisRowObject.firstChild);
+                                    thisRowObject = datastore.readCache(thisRowObject.firstChild, fopts);
                                     var siblings = ((thisRowObject.siblings) && (typeof (thisRowObject.siblings) === 'function')) //->
                                         ? thisRowObject.siblings(true) : null;
                                     if (siblings !== null) {
                                         prevHop = (siblings.length === 0) ? thisRowObject.key : siblings[siblings.length -1];
-                                        thisRowObject = datastore.readCache(prevHop, { namespace: namespace });
+                                        thisRowObject = datastore.readCache(prevHop, $.extend({}, fopts, { namespace: namespace }));
                                     } else {
                                         prevHop = null;
                                     }
@@ -400,7 +654,7 @@
                                     break;
                                 } else {
                                     nextHop = thisRowObject.next;
-                                    thisRowObject = datastore.readCache(thisRowObject.parentKey, { namespace: namespace });
+                                    thisRowObject = datastore.readCache(thisRowObject.parentKey, $.extend({}, fopts, { namespace: namespace }));
                                 }
                             }
                             return nextHop;
@@ -752,15 +1006,15 @@
                     if ((datastore) && (path) && (path === '-')) { // Previous Datastore rowObject
                         var findPrevHop = function(thisRowObject) { // Roll this into Datastore Method (FindMe!!)
                             var prevHop = null;
-                            thisRowObject = datastore.readCache(thisRowObject.prev);
+                            thisRowObject = datastore.readCache(thisRowObject.prev, fopts);
                             if ((thisRowObject !== null) && (thisRowObject.firstChild)) {
                                 while (thisRowObject.firstChild) {
-                                    thisRowObject = datastore.readCache(thisRowObject.firstChild);
+                                    thisRowObject = datastore.readCache(thisRowObject.firstChild, fopts);
                                     var siblings = ((thisRowObject.siblings) && (typeof (thisRowObject.siblings) === 'function')) //->
                                         ? thisRowObject.siblings(true) : null;
                                     if (siblings !== null) {
                                         prevHop = (siblings.length === 0) ? thisRowObject.key : siblings[siblings.length -1];
-                                        thisRowObject = datastore.readCache(prevHop);
+                                        thisRowObject = datastore.readCache(prevHop, fopts);
                                     } else {
                                         prevHop = null;
                                     }
@@ -891,7 +1145,8 @@
                     _PlasticBug(this, 4, 'comment');
                 };
                 if ((fopts) && (fopts.item)) { update[dsid] = fopts.item.value; };
-                thisds.updateRow(key, [ { "status" : "update", "id" : thisds.nextSequence() }, update ], //->
+                var thisStatus = (e.type === 'autocompleteselect') ? 'selectionupdate' : 'update';
+                thisds.updateRow(key, [ { "status" : thisStatus, "id" : thisds.nextSequence() }, update ], //->
                     retFunction, { namespace: namespace });
                 _PlasticBug('ID: ' + id + '(' + dsid + ')' + ' => ' + value, 4, 'comment');
                 _PlasticBug('DATASTORE: ' + datastore + ' => ' + namespace, 4, 'comment');
@@ -906,7 +1161,14 @@
             if ((plasticopts) && (plasticopts.fulfill) && (plasticopts.fulfill[thisId])) {
                 var thisFulfill = plasticopts.fulfill[thisId];
                 if (thisFulfill instanceof Array) {
-                    retFunction((thisFulfill.length) ? thisFulfill : thisEmpty);
+                    var thisReturnSet = [];
+                    for (var cntFF = 0; cntFF < thisFulfill.length; cntFF ++) {
+                        thisReturnSet[thisReturnSet.length] = {
+                            'class' : (thisFulfill[cntFF] === this.term) ? 'plastic-autofill-selected' : 'plastic-autofill-item'
+                           ,'value' : thisFulfill[cntFF]
+                        };
+                    }
+                    retFunction((thisReturnSet.length) ? thisReturnSet : thisEmpty);
                 } else if ((typeof (thisFulfill) === 'string') && //->
                     ($('#' + thisFulfill).length) && //->
                     ($('#' + thisFulfill)[0].fulfillList) && //->
@@ -917,7 +1179,7 @@
                     var thisList = $('#' + thisFulfill)[0].fulfillList(this.term);
                     retFunction((thisList.length) ? thisList : thisEmpty);
                 }
-            } else {
+            } else { // For Testing Only, Clean This Up (FindMe!!)
                 var tt = [];
                 for (var cnt = 0; cnt < 200; cnt ++) {
                 ///for (var cnt = 0; cnt < 10000; cnt ++) {
@@ -991,9 +1253,22 @@
         var feedbackDecayTMO = {};
         this.FeedbackActivate = function(active, autoclose) {
             var command = ((autoclose) || (autoclose === undefined)) ? 'active' : 'active.noclose';
+            $('.plastic-system-feedback-iconwrap', _PlasticRuntime.system.feedback).each(function(){
+                var type = $(this).attr('id').replace(/^plastic-feedback-/, '');
+                if (!(/all$/.test(type))) { // Skip silenceall and iconall items
+                    if (_PlasticPrefs.FeedbackIgnore.test(type)) { // Silence Messages??
+                        $('.plastic-system-feedback-icon-tattoo', this).addClass('ui-icon ui-icon-volume-off');
+                    } else if (_PlasticPrefs.FeedbackIconOnly.test(type)) { // Iconize Messages
+                        $('.plastic-system-feedback-icon-tattoo', this).addClass('ui-icon ui-icon-minusthick');
+                    } else { // Clear Previous Entries
+                        $('.plastic-system-feedback-icon-tattoo', this) //->
+                            .removeClass('ui-icon ui-icon-volume-off ui-icon-minusthick');
+                    }
+                }
+            });
             if ((active) || (active === undefined)) {
                 $('.plastic-system-feedback-frame').css({ 'display' : 'block' }).scrollTop(0);
-                $('.plastic-system-feedback').animate({height: 400}, 400, 'swing', function(){
+                $('.plastic-system-feedback').animate({height: '80%'}, 400, 'swing', function(){
                     $('.plastic-system-feedback-control').css({ 'display' : 'block' });
                     $('.plastic-system-feedback').trigger(command);
                 });
@@ -1009,6 +1284,13 @@
                 });
             }
         };
+        // Update Cookie Based Feedback Prefs
+        _._PlasticPrefs = $.extend({}, _._PlasticPrefs, {
+            FeedbackIgnore : (this.Cookie(_._PlasticPrefs.FeedbackIgnoreCookie)) //->
+                ? new RegExp(this.Cookie(_._PlasticPrefs.FeedbackIgnoreCookie)) : undefined
+           ,FeedbackIconOnly : (this.Cookie(_._PlasticPrefs.FeedbackIconCookie)) //->
+                ? new RegExp(this.Cookie(_._PlasticPrefs.FeedbackIconCookie)) : undefined
+        });
         this.Feedback = function(message, type, key, name, fopts) {
             // Rework "name" logic to switch focus to error element (FindMe!!)
             var weight = { error: 5, warning: 4, question: 3, success: 2, information: 1, clear: 0 };
@@ -1021,16 +1303,12 @@
             if (typeof (message) === 'string') { message = { name: message }; };
             var timestamp = (new Date()).toString();
             for (var thisIndex in message) {
-                if ($('input[name=silenceall]').prop('checked')) {
-                    if (!((fopts) && (fopts.breach))) {
-                        _PlasticBug('Ignoring all messages: ' + message[thisIndex], 4, 'comment');
-                        continue;
-                    }
-                } else if (($('input[name=silence' + type + ']').length) && //->
-                    ($('input[name=silence' + type + ']').prop('checked'))) {
-                    if (!((fopts) && (fopts.breach))) {
-                        _PlasticBug('Ignoring ' + type + ' messages: ' + message[thisIndex], 4, 'comment');
-                        continue;
+                if (_PlasticPrefs.FeedbackIgnore instanceof RegExp) {
+                    if (_PlasticPrefs.FeedbackIgnore.test(type)) {
+                        if (!((fopts) && ((fopts.breach) || (fopts.force)))) {
+                            _PlasticBug('Ignoring ' + type + ' messages: ' + message[thisIndex], 4, 'comment');
+                            continue;
+                        }
                     }
                 }
                 var thisId = ((fopts) && (fopts.identifier)) //->
@@ -1065,25 +1343,23 @@
                     $('#' + thisId).append($(thisButtonBar));
                     $('#' + thisId).find('.plastic-system-feedback-buttonbar button').button();
                 }
-                if ((weight[type] >= 2) && (!($('input[name=icononly]').prop('checked')))) {
+                if ((_PlasticPrefs.FeedbackIconOnly instanceof RegExp) && //->
+                    (_PlasticPrefs.FeedbackIconOnly.test(type))) {
+                    if ((fopts) && (fopts.force)) { // Force Popup
+                        Plastic.FeedbackActivate(true);
+                    } else { // Iconized Notification
+                        _PlasticBug('Iconizing ' + type + ' messages: ' + message[thisIndex], 4, 'comment');
+                        var throb = { big: { height: 48, width: 48 }, small: { height: 24, width: 24 } };
+                        if (!($('.plastic-system-feedback-icontab').hasClass('plastic-system-feedback-icontab-throbbing'))) {
+                            $('.plastic-system-feedback-icontab').addClass('plastic-system-feedback-icontab-throbbing');
+                            $('.plastic-system-feedback-icontab').animate(throb.big, 600, function(){
+                                $('.plastic-system-feedback-icontab').animate(throb.small);
+                                $('.plastic-system-feedback-icontab').removeClass('plastic-system-feedback-icontab-throbbing');
+                            });
+                        }
+                    }
+                } else { // Activate Visual "Popup" Notification
                     Plastic.FeedbackActivate(true);
-                } else {
-                    var throb = { big: { height: 48, width: 48 }, small: { height: 24, width: 24 } };
-                    if (($('.plastic-system-feedback-icontab').hasClass('plastic-system-feedback-bottomleft')) || //->
-                        ($('.plastic-system-feedback-icontab').hasClass('plastic-system-feedback-bottomright'))) {
-                        throb.big.top   = -52;
-                        throb.small.top = -28;
-                    } else {
-                        throb.big.bottom   = -52;
-                        throb.small.bottom = -28;
-                    }
-                    if (!($('.plastic-system-feedback-icontab').hasClass('plastic-system-feedback-icontab-throbbing'))) {
-                        $('.plastic-system-feedback-icontab').addClass('plastic-system-feedback-icontab-throbbing');
-                        $('.plastic-system-feedback-icontab').animate(throb.big, 600, function(){
-                            $('.plastic-system-feedback-icontab').animate(throb.small);
-                            $('.plastic-system-feedback-icontab').removeClass('plastic-system-feedback-icontab-throbbing');
-                        });
-                    }
                 }
                 if (decay) {
                     feedbackDecayTMO[thisId] = setTimeout(function(){
@@ -1335,23 +1611,41 @@
                         // Add default SysFeedback Component if not defined in Playbook
                         if (_PlasticRuntime.system.feedback === undefined) {
                             _PlasticRuntime.system.feedback = $('<div class="plastic-system-feedback" ' + //->
-                                'id="PlasticDefaultSysFeedback"><div class="plastic-system-feedback-control">Silence...&nbsp;' + //->
-                                '<span title="Check to silence all messages">' + //->
-                                '<label for="silenceall">All</label><input type="checkbox" name="silenceall"></span>' + //->
-                                '<span title="Check to silence error messages">' + //->
-                                '<label for="silenceerror">Errors</label><input type="checkbox" name="silenceerror"></span>' + //->
-                                '<span title="Check to silence warning messages">' + //->
-                                '<label for="silencewarning">Warnings</label><input type="checkbox" name="silencewarning"></span>' + //->
-                                '<span title="Check to silence question messages">' + //->
-                                '<label for="silencequestion">Questions</label><input type="checkbox" name="silencequestion"></span>' + //->
-                                '<span title="Check to silence information messages">' + //->
-                                '<label for="silenceinformation">Information</label><input type="checkbox" name="silenceinformation"></span>' + //->
-                                '<span title="Check to silence success messages">' + //->
-                                '<label for="silencesuccess">Success</label><input type="checkbox" name="silencesuccess"></span>' + //->
-                                '<span title="Check to display messages as icon indicator only">' + //->
-                                '<label for="icononly">Icon only?</label><input type="checkbox" name="icononly" checked></span>' + //->
-                                '<span title="Check to confirm and remove all messages">' + //->
-                                '<label for="confirmall">Confirm All</label><input type="checkbox" name="confirmall"></span>' + //->
+                                'id="PlasticDefaultSysFeedback">' + //->
+                                  '<div class="plastic-system-feedback-control">' + //->
+                                    '<span class="plastic-system-feedback-control-title">- System Messages -</span>' + //->
+                                    '<div class="plastic-system-feedback-iconbar">' + //->
+                                      '<div class="plastic-system-feedback-iconwrap" id="plastic-feedback-silenceall" ' + //->
+                                        'title="Click to toggle silence for all messages">' + //->
+                                        '<img class="plastic-system-feedback-icon" src="images/plastic-all.png">' + //->
+                                        '<div class="plastic-system-feedback-icon-tattoo" /></div>' + //->
+                                      '<div class="plastic-system-feedback-iconwrap" id="plastic-feedback-error" ' + //->
+                                        'title="Click to iconize error messages">' + //->
+                                        '<img class="plastic-system-feedback-icon" src="images/plastic-error.png">' + //->
+                                        '<div class="plastic-system-feedback-icon-tattoo" /></div>' + //->
+                                      '<div class="plastic-system-feedback-iconwrap" id="plastic-feedback-warning" ' + //->
+                                        'title="Click to iconize warning messages">' + //->
+                                        '<img class="plastic-system-feedback-icon" src="images/plastic-warning.png">' + //->
+                                        '<div class="plastic-system-feedback-icon-tattoo" /></div>' + //->
+                                      '<div class="plastic-system-feedback-iconwrap" id="plastic-feedback-question" ' + //->
+                                        'title="Click to iconize question messages">' + //->
+                                        '<img class="plastic-system-feedback-icon" src="images/plastic-question.png">' + //->
+                                        '<div class="plastic-system-feedback-icon-tattoo" /></div>' + //->
+                                      '<div class="plastic-system-feedback-iconwrap" id="plastic-feedback-information" ' + //->
+                                        'title="Click to iconize information messages">' + //->
+                                        '<img class="plastic-system-feedback-icon" src="images/plastic-information.png">' + //->
+                                        '<div class="plastic-system-feedback-icon-tattoo" /></div>' + //->
+                                      '<div class="plastic-system-feedback-iconwrap" id="plastic-feedback-success" ' + //->
+                                        'title="Click to iconize success messages">' + //->
+                                        '<img class="plastic-system-feedback-icon" src="images/plastic-success.png">' + //->
+                                        '<div class="plastic-system-feedback-icon-tattoo" /></div>' + //->
+                                      '<div class="plastic-system-feedback-iconwrap" id="plastic-feedback-iconall" ' + //->
+                                        'title="Click to toggle iconize for all messages">' + //->
+                                        '<img class="plastic-system-feedback-icon" src="images/plastic-icon.png">' + //->
+                                        '<div class="plastic-system-feedback-icon-tattoo" /></div>' + //->
+                                  '</div>' + //->
+                                '<span class="plastic-system-feedback-control-button" ' + //->
+                                  'title="Check to confirm and remove all messages">Confirm All Messages</span>' + //->
                                 '</div><div class="plastic-system-feedback-icontab" ' + //->
                                 'title="Click to view waiting messages" />' + //->
                                 '<div class="plastic-system-feedback-frame" /></div>');
@@ -1360,28 +1654,101 @@
                                 .addClass('plastic-system-feedback-bottomright');
                         }
                         if (_PlasticRuntime.system.commitpane === undefined) {
-                            var commitTM0 = 0, commitClasses = [ 'apng-level0' //->
-                               ,'apng-level1', 'apng-level2', 'apng-level3', 'apng-level4', 'apng-level5'
-                               ,'apng-level6', 'apng-level7', 'apng-level8', 'apng-level9', 'apng-level10'
-                               ,'apng-level11', 'apng-level12', 'apng-level13', 'apng-level14', 'apng-level15'
-                            ];
-                            $.each(['show', 'hide'], function(index, name){ // Add triggers for show and hide
-                                var origFunction = $.fn[name];
-                                $.fn[name] = function(speed) {
-                                    return origFunction.apply(this, arguments).trigger(name + '.plastic');
-                                };
-                            });
-                            _PlasticRuntime.system.commitpane = $('<div class="plastic-commit-pane"><em>Please Wait...</em></div>');
+                            var paneContent = //->
+                                '<div class="plastic-commit-pane plastic-not-authenticated">' + //->
+                                '  <div class="plastic-commit-bgimage" />' + //->
+                                '  <em>Please Wait...</em>' + //->
+                                '  <div class="plastic-login-frame">' + //->
+                                '    <div class="plastic-login-icon"><img src="images/plastic-lock.png"></div>' + //->
+                                '    <div class="plastic-login-title">System Login</div>' + //->
+                                '    <div class="plastic-login-capslock">' + //->
+                                '      <img src="images/plastic-warning.png" width="24" height="24">WARNING: Caps Lock on' + //->
+                                '    </div>' + //->
+                                '    <table width="490"><tbody>' + //->
+                                '      <tr><td><label for="plastic-auth-user">Login Name:</label></td>' + //->
+                                '      <td><input type="text" name="plastic-auth-user" id="plastic-auth-user"></td></tr>' + //->
+                                '      <tr><td><label for="plastic-auth-pass">Password:</label></td>' + //->
+                                '      <td><input type="password" name="plastic-auth-pass" id="plastic-auth-pass"></td></tr>' + //->
+                                '      <tr><td colspan="2"><button id="plastic-auth-abort">Cancel</button>' + //->
+                                '        <button id="plastic-auth-signon" disabled>Sign On</button></td></tr>' + //->
+                                '    </tbody></table>' + //->
+                                '  </div>' + //->
+                                '  <div class="plastic-error-frame" />' + //->
+                                '</div>';
+                            _PlasticRuntime.system.commitpane = $(paneContent);
                             $(_PlasticRuntime.root).append(_PlasticRuntime.system.commitpane);
-                            var commitActive = function(){
-                                if (commitTM0) { clearTimeout(commitTM0); commitTM0 = 0; };
-                                commitClasses.push(commitClasses.shift()); // Revolve Classes
-                                _PlasticRuntime.system.commitpane //->
-                                    .removeClass(commitClasses.slice(0, commitClasses.length -1).join(' ')) //->
-                                    .addClass(commitClasses[commitClasses.length -1]);
-                                if (_PlasticRuntime.system.commitpane.is(':visible')) { setTimeout(commitActive, 100); };
-                            };
-                            _PlasticRuntime.system.commitpane.on('show.plastic', commitActive);
+                            $('#plastic-auth-abort').button() // Decorate Cancel Button
+                                .on('click', function(){
+                                    $('.plastic-commit-pane').removeClass('plastic-not-authenticated') //->
+                                        .addClass('plastic-login-error');
+                                    if (_PlasticPrefs.HttpError401) {
+                                        $('.plastic-error-frame').load(_PlasticPrefs.HttpError401);
+                                    }
+                                    $('.plastic-error-frame').animate({ height: '90%', width: '90%'}, 1200);
+                                });
+                            $('#plastic-auth-signon').button(); // Decorate Sign-On Button
+                            var errorContents = '<center>' + //->
+                                '<h1>Authentication Canceled</h1>' + //->
+                                '<p>This application requires the user to be authenticated for access ' + //->
+                                'but the authentication request was canceled.<br><br>' + //->
+                                '<a href="javascript:window.history.go(0)">Click Here</a> to attempt authentication again<br><br>' + //->
+                                'Or<br><br>' + //->
+                                '<a href="javascript:window.close()">Close this page</a> to cancel the application login.</p>' + //->
+                                '</center>';
+                            $('.plastic-error-frame:first').html(errorContents);
+                            _PlasticRuntime.system.commitpane.bind('keydown.plastic-commitpane', function(event){
+                                // Prevent tabbing out of commit and login modals (borrowed from jqueryui/dialog)
+                                // ** http://jqueryui.com/dialog/ ** //
+                                if ( event.keyCode !== $.ui.keyCode.TAB ) {
+                                    return;
+                                }
+                                var tabbables = $(':tabbable', this),
+                                    first = tabbables.filter(':first'),
+                                    last  = tabbables.filter(':last');
+                                if (event.target === last[0] && !event.shiftKey) {
+                                    first.focus(1);
+                                    return false;
+                                } else if (event.target === first[0] && event.shiftKey) {
+                                    last.focus(1);
+                                    return false;
+                                }
+                            });
+                            _PlasticRuntime.system.commitpane.bind('keyup.plastic-commitpane', function(event){
+                                // Manage Enabling, Disabling And Executing Buttons
+                                if ((_PlasticPrefs.AuthUserPattern) && //->
+                                    (_PlasticPrefs.AuthUserPattern.test($('#plastic-auth-user').val())) && //->
+                                    (_PlasticPrefs.AuthPassPattern) && //->
+                                    (_PlasticPrefs.AuthPassPattern.test($('#plastic-auth-pass').val()))) {
+                                    $('#plastic-auth-signon').button('option', 'disabled', false);
+                                } else {
+                                    $('#plastic-auth-signon').button('option', 'disabled', true);
+                                }
+                                if ( event.keyCode === $.ui.keyCode.ENTER ) {
+                                    if ($(event.target).attr('id') === 'plastic-auth-user') {
+                                        $('#plastic-auth-pass').focus();
+                                    } else if ($(event.target).attr('id') === 'plastic-auth-pass') {
+                                        $('#plastic-auth-signon').click();
+                                        $('#plastic-auth-pass').focus();
+                                    }
+                                } else if ( event.keyCode === $.ui.keyCode.ESCAPE ) {
+                                    $('#plastic-auth-abort').click();
+                                } else if ( event.keyCode === $.ui.keyCode.CAPS_LOCK ) {
+                                    $('.plastic-login-capslock').toggleClass('plastic-capslock-on');
+                                } else if (/^[A-Za-z]$/.test( event.key )) { // Caps Lock Detection
+                                    var capAction = (/^[A-Z]$/.test( event.key )) //->
+                                        ? (event.shiftKey) //->
+                                            ? 'removeClass' : 'addClass' //->
+                                        : (event.shiftKey) //->
+                                            ? 'addClass' : 'removeClass';
+                                    $('.plastic-login-capslock')[capAction]('plastic-capslock-on');
+                                }
+                            });
+                            _PlasticRuntime.system.commitpane.on('show.plastic', function(){
+                                $('#plastic-auth-user').focus();
+                            });
+                            _PlasticRuntime.system.commitpane.on('hide.plastic', function(){
+                                _PlasticRuntime.system.commitpane.unbind('keypress.plastic-commitpane');
+                            });
                         }
                         $(_PlasticRuntime.root).on('keyup', function(e){
                             if ((e.shiftKey) && (e.ctrlKey) && (e.keyCode == 70)) { // [Ctrl]-[Shift]-F
@@ -1400,7 +1767,10 @@
                                 feedbackTMO = -feedbackTMO;
                             }
                         });
-                        $(_PlasticRuntime.root).on('click', '.plastic-system-feedback-message', function(){
+                        $(_PlasticRuntime.system.feedback).on('mousedown', '.plastic-system-feedback-message', function(){
+                            _PlasticRuntime.system.feedback[0].preFeedback = $(':focus');
+                        });
+                        $(_PlasticRuntime.system.feedback).on('click', '.plastic-system-feedback-message', function(){
                             if (!($(this).hasClass('plastic-system-feedback-question'))) { // Questions Must Be Answered
                                 var decayId = $(this).attr('id');
                                 if (feedbackDecayTMO[decayId]) {
@@ -1414,32 +1784,87 @@
                                         Plastic.FeedbackActivate(false);
                                     }
                                 });
+                                if (_PlasticRuntime.system.feedback[0].preFeedback) {
+                                    _PlasticRuntime.system.feedback[0].preFeedback.focus();
+                                    delete(_PlasticRuntime.system.feedback[0].preFeedback);
+                                }
                             }
                         });
                         $(_PlasticRuntime.root).on('click', '.plastic-system-feedback-icontab', function(){
                             Plastic.FeedbackActivate(true);
                         });
-                        $(_PlasticRuntime.root).on('click', '.plastic-system-feedback-control span input', function(e){
-                            if (!(e.originalEvent)) {
-                                e.preventDefault();
-                                $(this).prop('checked', (!($(this).prop('checked'))));
-                            }
-                            if ((e.target.name) && (e.target.name === "confirmall")) {
-                                $(this).prop('checked', false);
-                                $('.plastic-system-feedback-message:not(.plastic-system-feedback-question)').each(function(){
-                                    var decayId = $(this).attr('id');
-                                    if (feedbackDecayTMO[decayId]) {
-                                        clearTimeout(feedbackDecayTMO[decayId]);
-                                        delete(feedbackDecayTMO[decayId]);
+                        $(_PlasticRuntime.system.feedback).on('click', '.plastic-system-feedback-iconwrap', function(e){
+                            var thisTattoo = $('.plastic-system-feedback-icon-tattoo', this);
+                            var thisType = $(this).attr('id').replace(/^plastic-feedback-/, '');
+                            if ((thisType === 'silenceall') || (thisType === 'iconall')) {
+                                var thisDoA = (thisType === 'silenceall') //-> Delete Or Add??
+                                    ? $('.plastic-system-feedback-icon-tattoo', $(this).parent()).is('.ui-icon-volume-off') //->
+                                    : $('.plastic-system-feedback-icon-tattoo', $(this).parent()).is('.ui-icon-minusthick');
+                                var thisIconSet = (thisType === 'silenceall') //->
+                                    ? $(this).nextAll('.plastic-system-feedback-iconwrap:not(:last)') //->
+                                    : $(this).prevAll('.plastic-system-feedback-iconwrap:not(:last)');
+                                thisIconSet.each(function(){
+                                    var childTattoo = $('.plastic-system-feedback-icon-tattoo', this);
+                                    var childType = $(this).attr('id').replace(/^plastic-feedback-/, '');
+                                    if (thisDoA) { // Delete Or Add??
+                                        childTattoo.removeClass('ui-icon ui-icon-volume-off ui-icon-minusthick') //->
+                                    } else {
+                                        childTattoo.removeClass('ui-icon-volume-off ui-icon-minusthick') //->
+                                            .addClass( //->
+                                                (thisType === 'silenceall') //->
+                                                    ? 'ui-icon ui-icon-volume-off' //->
+                                                    : 'ui-icon ui-icon-minusthick' //->
+                                            );
                                     }
                                 });
-                                $('.plastic-system-feedback-message:not(.plastic-system-feedback-question)').fadeOut(400, function(){
-                                    _PlasticBug(this, 4, 'function');
-                                    $('.plastic-system-feedback-message').remove();
-                                    $('.plastic-system-feedback-icontab').removeClass('plastic-system-feedback-waiting');
-                                    Plastic.FeedbackActivate(false);
-                                });
+                            } else {
+                                if (!(thisTattoo.hasClass('ui-icon'))) { // No Tattoo
+                                    // Toggle Icon-Only
+                                    thisTattoo.addClass('ui-icon ui-icon-minusthick');
+                                    $(this).attr('title', 'Click to silence ' + thisType  + ' messages');
+                                } else if (thisTattoo.hasClass('ui-icon-minusthick')) { // Icon Only
+                                    // Toggle Silent
+                                    thisTattoo.removeClass('ui-icon-minusthick').addClass('ui-icon-volume-off');
+                                    $(this).attr('title', 'Click to enable ' + thisType  + ' messages');
+                                } else if (thisTattoo.hasClass('ui-icon-volume-off')) { // Silent
+                                    // Reset To Standard Feedback
+                                    thisTattoo.removeClass('ui-icon ui-icon-minusthick ui-icon-volume-off');
+                                    $(this).attr('title', 'Click to iconize ' + thisType  + ' messages');
+                                }
                             }
+                            var thisIgnoreList = [], thisIconList = [];
+                            // Find Ignore List
+                            $('.ui-icon-volume-off', $(this).parent()).closest('.plastic-system-feedback-iconwrap').each(function(){
+                                thisIgnoreList[thisIgnoreList.length] = $(this).attr('id').replace(/^plastic-feedback-/, '');
+                            });
+                            // Find Icon List
+                            $('.ui-icon-minusthick', $(this).parent()).closest('.plastic-system-feedback-iconwrap').each(function(){
+                                thisIconList[thisIconList.length] = $(this).attr('id').replace(/^plastic-feedback-/, '');
+                            });
+                            _PlasticPrefs.FeedbackIgnore = new RegExp('^(' + thisIgnoreList.join('|') + ')$');
+                            _PlasticPrefs.FeedbackIconOnly = new RegExp('^(' + thisIconList.join('|') + ')$');
+                            // Save Prefs In Cookie
+                            var expire = new Date();
+                            expire.setYear(expire.getYear() + 1901); // Set Expiration One Year Out
+                            Plastic.Cookie(_PlasticPrefs.FeedbackIgnoreCookie, //->
+                                _PlasticPrefs.FeedbackIgnore.source, undefined, expire);
+                            Plastic.Cookie(_PlasticPrefs.FeedbackIconCookie, //->
+                                _PlasticPrefs.FeedbackIconOnly.source, undefined, expire);
+                        });
+                        $(_PlasticRuntime.system.feedback).on('click', '.plastic-system-feedback-control-button', function(e){
+                            $('.plastic-system-feedback-message:not(.plastic-system-feedback-question)').each(function(){
+                                var decayId = $(this).attr('id');
+                                if (feedbackDecayTMO[decayId]) {
+                                    clearTimeout(feedbackDecayTMO[decayId]);
+                                    delete(feedbackDecayTMO[decayId]);
+                                }
+                            });
+                            $('.plastic-system-feedback-message:not(.plastic-system-feedback-question)').fadeOut(400, function(){
+                                _PlasticBug(this, 4, 'function');
+                                $('.plastic-system-feedback-message').remove();
+                                $('.plastic-system-feedback-icontab').removeClass('plastic-system-feedback-waiting');
+                                Plastic.FeedbackActivate(false);
+                            });
                         });
                         $(_PlasticRuntime.root).on('click', '.plastic-system-feedback-control span', function(e){
                             if (e.target.nodeName !== 'INPUT') {
@@ -1526,6 +1951,7 @@
         };
     };
 })(window, jQuery);
+
 
 jQuery(window).load(function(){
     Plastic.Init();

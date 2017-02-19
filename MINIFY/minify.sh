@@ -36,7 +36,20 @@ COPYRIGHT='
 
 function dieError() {
     echo $0 Ver. $VERSION
-    echo "Usage: $0"
+    echo "Usage: $0 [OPTIONS]"
+    echo "     nojq    : Disable jQuery Libraries"
+    echo "     nobi    : Disable BigInt Libraries"
+    echo "     nora    : Disable rangy Libraries"
+    echo "     nocm    : Disable contextMenu Libraries"
+    echo "     nosl    : Disable SparkLine Libraries"
+    echo "     nody    : Disable Dynatree Libraries"
+    echo "     nodt    : Disable DataTables Libraries"
+    echo "     nohs    : Disable Hash Calculation Libraries"
+    echo "     nopf    : Disable JS Pollyfill (<=IE9)"
+    echo "     enqu    : Disable QUinit Libraries"
+    echo "     endb    : Disable Plastic Debug Messages"
+    echo "    -help    : Display this Help Message"
+    echo "-"
     echo "Terminating with exit code ${2-255}:"
     echo "    ${1-An error has occured}"  # Message
     exit ${2-255}                         # Exit Code
@@ -67,8 +80,16 @@ sweepArgsFor 'nody' $* # Disable Dynatree Libraries ??
 OPT_NODY=$?
 sweepArgsFor 'nodt' $* # Disable DataTables Libraries ??
 OPT_NODT=$?
+sweepArgsFor 'nohs' $* # Disable Hash Calculation Libraries ??
+OPT_NOHS=$?
+sweepArgsFor 'nopf' $* # Disable JS Pollyfill (<=IE9) ??
+OPT_NOPF=$?
 sweepArgsFor 'enqu' $* # Enable QUinit Libraries ??
 OPT_ENQU=$?
+sweepArgsFor 'endb' $* # Enable Plastic Debug Messages ??
+OPT_ENDB=$?
+sweepArgsFor '-help' $* # Help Message Requested ??
+[ $? -gt 0 ] && dieError "Help Requested" 240
 
 export COPYRIGHT
 [ -e "$(which dirname 2> /dev/null)" ] || dieError "Unable to locate 'dirname' utility" 10
@@ -100,14 +121,16 @@ echo "Minifying files:"
     [ $OPT_NODT -gt 0 ] || echo ../scripts/jquery.dataTables.js
     [ $OPT_NODT -gt 0 ] || echo ../scripts/dataTables.scroller.js
     [ $OPT_NODT -gt 0 ] || echo ../scripts/ui.multiselect.js
+    [ $OPT_NOHS -gt 0 ] || echo ../scripts/sha.js
+    [ $OPT_NOPF -gt 0 ] || echo ../scripts/PlasticBase64Polyfill.js
     [ $OPT_ENQU -gt 0 ] && echo ../scripts/qunit.js
 )   | xargs cat \
     | sed 's#/\*!#/\* #g' \
     | ( [ $OPT_ENQU -gt 0 ] && cat || grep -v -- '-##QUNIT##-' ) \
-    | perl -ne 'print $_ unless ($_ =~ /(?<!_[.])_PlasticBug/)' \
+    | ( [ $OPT_ENDB -gt 0 ] && cat || perl -ne 'print $_ unless ($_ =~ /(?<!_[.])_PlasticBug/)' ) \
     | perl -ne 'if ($.==1){print $ENV{COPYRIGHT}.$_;}else{print $_}' \
     | java -jar ../NOT-PLASTIC/yuicompressor-2.4.8.jar --type js -o pdmk-min.js
-#    | cat > pdmk-min.js
+##    | cat > pdmk-min.js
 
 (
     [ $OPT_ENQU -gt 0 ] && echo ../style/qunit.css
@@ -121,6 +144,7 @@ echo "Minifying files:"
     | sed 's#/\*!#/\*#g' \
     | perl -ne 'if ($.==1){print $ENV{COPYRIGHT}.$_;}else{print $_}' \
     | java -jar ../NOT-PLASTIC/yuicompressor-2.4.8.jar --type css -o pdmk-min.css
+##    | cat > pdmk-min.css
 
 echo "Copying minified files:"
 cp -v pdmk-min.js ../scripts/

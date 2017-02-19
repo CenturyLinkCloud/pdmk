@@ -55,22 +55,26 @@ Core Software Architecture and Plastic Contributors [pdmk]
   Design -
 
     Chief Software Architect - John Woodworth <john.woodworth@centurylink.com>
-    Software Consultant - Dean Ballew <dean.ballew@centurylink.com>
-    Graphical Consultant - Shashwath Bindinganaveli Raghavan
+    Software Integration Consultant - Dean Ballew <dean.ballew@centurylink.com>
+    Graphical Interface Consultant - Shashwath Bindinganaveli Raghavan
 
   Development -
 
-    Lead Software Developer - John Woodworth <john.woodworth@centurylink.com>
-    Playbook Consultant - Dean Ballew <dean.ballew@centurylink.com>
+    Chief Software Architect - John Woodworth <john.woodworth@centurylink.com>
+    Lead Playbook Consultant - Dean Ballew <dean.ballew@centurylink.com>
   
   Testing -
 
-    Chief Test Architect - Dean Ballew <dean.ballew@centurylink.com>
-    Test Architect - Shashwath Bindinganaveli Raghavan
+    Test Architect/ Consultant - Shashwath Bindinganaveli Raghavan
+
+  End User Enablement -
+
+    Chief Systems Integrator - John Woodworth <john.woodworth@centurylink.com>
+    Chief End User Integrator - Dean Ballew <dean.ballew@centurylink.com>
 
   Official [pdmk] Code Maintainers -
 
     Chief Software Architect - John Woodworth <john.woodworth@centurylink.com>
-    Playbook Consultant - Dean Ballew <dean.ballew@centurylink.com>
+    Chief End User Integrator - Dean Ballew <dean.ballew@centurylink.com>
 
 

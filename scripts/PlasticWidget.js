@@ -11,7 +11,7 @@
 / Support Contact: plastic@centurylink.com
 /
 / Created: 04 January, 2014
-/ Last Updated: 10 February, 2016
+/ Last Updated: 10 February, 2017
 /
 / VERSION: 1.0.0b
 /
@@ -209,8 +209,13 @@
                         }
                     }
                 });
-                $(this).on('click', '.plastic-field-select', function(){
-                    $(this).autocomplete('close');
+                $(this).on('click', 'input.plastic-field-select', function(){
+                    if ($(this).autocomplete('widget').is(':visible')) {
+                        $(this).autocomplete('close');
+                    } else {
+                        $('*[autocomplete]').autocomplete('close'); // Close any open autocompletes
+                        $(this).focus().select().autocomplete('search', '');
+                    }
                 });
                 $(this).on('click', '.plastic-field-dropdown', function(){
                     if (!($(this).children('div:first').hasClass('plastic-disabled'))) {
@@ -218,7 +223,7 @@
                             $(this).prev('input').autocomplete('close');
                         } else {
                             $('*[autocomplete]').autocomplete('close'); // Close any open autocompletes
-                            $(this).prev('input').autocomplete('search','');
+                            $(this).prev('input').focus().select().autocomplete('search','');
                         }
                     }
                 });
@@ -559,7 +564,7 @@
                                     var groupHeaderRow = '';
                                     var groupHeaders = [];
                                     var groupLabels = [];
-                                    thisRow += '<td colspan="4">'; // Fix This Quick (FindMe!!)
+                                    thisRow += '<td colspan="2">'; // Fix This Quick (FindMe!!)
                                     thisRow += '<fieldset class="plastic-field-group" name="' + thisId + '" id="' + thisId + '">';
                                     thisRow += '<legend class="plastic-field-group-legend">' + thisNameLabel + ':' + thisButtons + '</legend>';
                                     thisRow += '<div class="plastic-field-group-wrapper">';
@@ -816,9 +821,12 @@
                             });
                         }
                     }
-                    $(this).find('.plastic-field-group-wrapper').each(function(){
-                        $(this).width($(this).closest('.Plastic.widget-form').innerWidth() * .92);
-                    });
+                    //$(this).find('.plastic-field-group-wrapper').each(function(){ // Retire?? (FindMe!!)
+                    //    var closeForm = $(this).closest('.Plastic.widget-form');
+                    //    if (closeForm.is(':visible')) {
+                    //        $(this).width(closeForm.innerWidth() * .92);
+                    //    }
+                    //});
                     ///$('.plastic-field-group-table').dataTable({ scrollY: 300, paging: false, searching: false });
                     $(this).find('.plastic-field-group-table').each(function(){
                         var thisTable = $(this).closest('.plastic-field-group').attr('id');
@@ -875,14 +883,17 @@
                                 .appendTo( ul );
                         };
                     });
-                    $(this).scrollTop(0); // Scroll form to top before switching focus
                     thisForm.disable(undefined, rowObjects[1], {});
-                    $('#' + focusId).focus().select(); // Switch focus to form element
                     // DataTable Bug Work-Around?? (FindMe!!)
                     $(this).find('.plastic-field-group .plastic-field-group-table tr').each(function(){
                         $(this).find('th:eq(1)').triggerHandler('click');
                     });
-                    if ((rowObjects.length > 1) && (rowObjects[1].deleted)) { thisForm.disable(true); };
+                    if ((rowObjects.length > 1) && //->
+                        ((rowObjects[1].deleted) || (rowObjects[1].disabled))) {
+                        thisForm.disable(true);
+                    }
+                    $(this).scrollTop(0); // Scroll form to top before switching focus
+                    $('#' + focusId).focus().select(); // Switch focus to form element
                 };
                 ///PlasticUnit.call(this, 'PlasticWidget', 'Render Defined', function() {
                 /*
@@ -896,6 +907,7 @@
                 thisForm.update = function _plasticwidget_form_update(rowObjects) {
                     var formId = $(this).attr('id');
                     var thisReplace = new RegExp('^' + formId + '_');
+                    var fulfill = ((self.length) && (self[0].plasticopts) && (self[0].plasticopts.fulfill)) ? self[0].plasticopts.fulfill : null;
                     this.source = (rowObjects[0].source) ? rowObjects[0].source : undefined;
                     $(this).data('plastic-row', rowObjects[1]);
                     if ((rowObjects.length > 1) && (rowObjects[1].deleted)) { thisForm.disable(true); };
@@ -2203,9 +2215,9 @@ return true;
                 thisFilterDiv += '  <div id="' + thisId + '_right" class="plastic-filterlist-right">';
                 thisFilterDiv += '    <div class="plastic-filterlist-top">';
                 thisFilterDiv += '      <label class="plastic-filterlist-title">' + rightLabel + ':</label>';
-                thisFilterDiv += '      <div class="plastic-filterlist-selectall"><span class="ui-icon ui-icon-plus" title="Select All" /></div>';
-                thisFilterDiv += '      <div class="plastic-filterlist-refreshall"><span class="ui-icon ui-icon-refresh" title="Refresh Sorting" /></div>';
                 thisFilterDiv += '      <div class="plastic-filterlist-searchwrap">';
+                thisFilterDiv += '        <div class="plastic-filterlist-selectall"><span class="ui-icon ui-icon-plus" title="Select All" /></div>';
+                thisFilterDiv += '        <div class="plastic-filterlist-refreshall"><span class="ui-icon ui-icon-refresh" title="Refresh Sorting" /></div>';
                 thisFilterDiv += '        <div class="plastic-filterlist-search">';
                 thisFilterDiv += '          <span class="ui-icon ui-icon-search"></span>';
                 thisFilterDiv += '          <div><input type="text" name="' + thisId + '_search"></div>';
@@ -2224,7 +2236,7 @@ return true;
 ///                    $(this).outerHeight($(this).parent().height() - $(this).parent().children('ul:first').outerHeight());
 ///                    thisWidget.adjustWidth();
 ///                });
-                this.fulfillList = function(selected){
+                this.fulfillList = function(selected, hitOnly){
                     _PlasticBug(this, 4, 'comment');
                     var retVal = [];
                     for (var thisItem in listItems) {
@@ -2232,6 +2244,7 @@ return true;
                             (/^[0-9-]/.test(listSelected[listItems[thisItem]]))) {
                             var thisClass = ((selected) && (listItems[thisItem] === selected)) //->
                                 ? 'plastic-autofill-selected' : 'plastic-autofill-item';
+                            if ((hitOnly) && thisClass !== 'plastic-autofill-selected') { continue; };
                             retVal[retVal.length] = { key: thisItem, 'class': thisClass, value: listItems[thisItem] };
                         }
                     }
@@ -2315,72 +2328,41 @@ return true;
                     $(thisWidget).find('.plastic-filterlist-complete li').sort(sorter).appendTo($(thisWidget).find('.plastic-filterlist-complete div'));
                 };
                 this.adjustWidth = function() {
-                    $(thisWidget).find('.plastic-filterlist-complete div, .plastic-filterlist-selected div').css({ width: 'auto' });
-                    $(thisWidget).find('.plastic-filterlist-complete, .plastic-filterlist-selected').each(function(){
-                        $(this).children('div').width( this.scrollWidth );
-                    });
+                //    $(thisWidget).find('.plastic-filterlist-complete div, .plastic-filterlist-selected div').css({ width: 'auto' });
+                //    $(thisWidget).find('.plastic-filterlist-complete, .plastic-filterlist-selected').each(function(){
+                //        $(this).children('div').width( this.scrollWidth );
+                //    });
                 };
                 this.rowsRead = function _plasticwidget_filterlist_rowsRead(rowObjects, fopts) {
+                    var display = ((self.length > 0) && (self[0].plasticopts) && (self[0].plasticopts.display)) ? self[0].plasticopts.display : null;
+                    var tooltip = ((self.length > 0) && (self[0].plasticopts) && (self[0].plasticopts.tooltip)) //->
+                        ? self[0].plasticopts.tooltip //->
+                        : (display) ? display : null;
                     _PlasticBug('rowsRead(rowObjects); called', 4, 'function');
                     if (rowObjects) {
-                        if (rowObjects.length === 1) {
-                            while (listHierarchy.length) {
-                                var tryNext = listHierarchy.pop();
-                                if (tryNext[1] === null) { continue; };
-                                datastore.readRows(tryNext[0], tryNext[1], thisWidget.rowsRead, { namespace: namespace });
-                                break;
-                            }
-                            if (listHierarchy.length === 0) {
-                                // Clear Selected List
-                                $(thisWidget).find('.plastic-filterlist-selected div').html('');
-                                var thisComplete = $(thisWidget).find('.plastic-filterlist-complete div');
-                                var completeList = [];
-                                for (var thisItem in listItems) {
-                                    completeList[completeList.length] = '<li class="ui-element ui-state-default" ' + //->
-                                        ' itemKey="' + thisItem + '"' + //->
-                                        ' title="' + listItems[thisItem] + '">' + //->
-                                        '<span class="ui-icon ui-icon-plus plastic-filterlist-select" />' + listItems[thisItem] + '</li>';
-                                }
-                                thisComplete.html($(completeList.join('')));
-                            }
-                        } else {
-                            var thisKeys = {};
-                            // Collect These Keys
-                            for (var cntRowObject = 1; cntRowObject < rowObjects.length; cntRowObject ++) {
-                                thisKeys[rowObjects[cntRowObject].key] = 1;
-                            }
-                            // Process These Keys
-                            for (var cntRowObject = 1; cntRowObject < rowObjects.length; cntRowObject ++) {
-                                var rowObject = rowObjects[cntRowObject];
-                                var parentkey = rowObject.parentKey;
-                                var key = rowObject.key;
-                                var prev = rowObject.prev;
-                                var next = rowObject.next;
-                                if (listItems[key] === undefined) {
-                                    ///cl('ROW0: ' + rowObjects[1].title);
-                                    ///cl('ROW1: ' + rowObjects[1].attributes.name);
-                                    ///listItems[key] = rowObject.title;
-                                    listItems[key] = rowObject.attributes.name;
-                                    listHierarchy[listHierarchy.length] = [parentkey, next];
-                                    datastore.readRows(key, null, thisWidget.rowsRead, { namespace: namespace });
-                                } else if (next) {
-                                    if (!(thisKeys[next])) {
-                                        datastore.readRows(key, next, thisWidget.rowsRead, { namespace: namespace });
-                                    }
-                                }
-                            }
+                        // Clear Selected List // rowObject.attributes.name
+                        $(thisWidget).find('.plastic-filterlist-selected div').html('');
+                        var thisComplete = $(thisWidget).find('.plastic-filterlist-complete div');
+                        var completeList = [];
+                        for (var cntRow = 1; cntRow < rowObjects.length; cntRow ++) {
+                            var rowObject = rowObjects[cntRow];
+                            var thisKey = rowObject.key;
+                            var thisTooltip = ((tooltip) && (tooltip in rowObject.attributes)) //->
+                                ? rowObject.attributes[tooltip] //->
+                                : ((tooltip) && (tooltip in rowObject)) ? rowObject[tooltip] : null;
+                            listItems[thisKey] = ((display) && (display in rowObject.attributes)) //->
+                                ? rowObject.attributes[display] //->
+                                : ((display) && (display in rowObject)) ? rowObject[display] : null;
+                            completeList[completeList.length] = '<li class="ui-element ui-state-default" ' + //->
+                                ' itemKey="' + thisKey + '"' + //->
+                                ' title="' + thisTooltip + '">' + //->
+                                '<span class="ui-icon ui-icon-plus plastic-filterlist-select"' + //->
+                                ' title="Toggle This Selection" />' + listItems[thisKey] + '</li>';
+                                //' title="Toggle This Selection" />' + //->
+                                //'<span class="plastic-filterlist-sizer">' + listItems[thisKey] + '</span></li>';
                         }
+                        thisComplete.html($(completeList.join('')));
                     }
-                };
-                this.bindDatastore = function _plasticwidget_filterlist_bindDatastore(){
-                    _PlasticBug("bindDatastore(PlasticDatastore[, Namespace]); called", 4, 'function');
-                    _PlasticBug(this, 4, 'comment');
-                    if (arguments.length === 0) { _PlasticBug("Usage: this.bindDatastore(PlasticDatastore[, Namespace]);", undefined, undefined, 'warn'); };
-                    datastore.readRows(null, null, thisWidget.rowsRead, { namespace: namespace });
-                    //var namespace = (arguments.length == 2) ? arguments[1] : "default";
-                    //datastore[namespace] = arguments[0];
-                    //datastore[namespace].bindView(this, namespace);
-                    //datastore[namespace].readRows(null, null, self.rowsRead, { namespace: namespace });
                 };
                 this.render = function _plasticwidget_filterlist_render(rowObjects){
                     self._register.call(this, rowObjects);
@@ -2451,8 +2433,14 @@ return true;
                 };
 */
                 this.init = function _plasticwidget_filterlist_init(){
+                    throw new Error('_plasticwidget_filterlist_init');
                     datastore.readRows(null, null, thisWidget.rowsRead, { namespace: namespace });
                 };
+                $(this).on('initialize.plastic', function (e) {
+                    if (e.target === this) { // Direct events only
+                        datastore.readRows(null, null, thisWidget.rowsRead, { namespace: namespace, flatten: true });
+                    }
+                });
                 return $(this);
             }
            ,menu: function _plasticwidget__make_menu(fopts) {
@@ -2518,10 +2506,12 @@ return true;
                     $(this).find('.plastic-iframe-frame:first').attr({ 'src' : 'about:blank' });
                 });
                 $(this).on('initialize.plastic', function (e) {
-                    if ($(this).is('.plastic-visible-inactive')) {
-                        var thisLocation = ((fopts) && (fopts.random === false)) //->
-                            ? baseLocation : baseLocation + '?uniq=' + Math.random();
-                        $(this).find('.plastic-iframe-frame:first').attr({ 'src' : thisLocation });
+                    if (e.target === this) { // Direct events only
+                        if ($(this).is('.plastic-visible-inactive')) {
+                            var thisLocation = ((fopts) && (fopts.random === false)) //->
+                                ? baseLocation : baseLocation + '?uniq=' + Math.random();
+                            $(this).find('.plastic-iframe-frame:first').attr({ 'src' : thisLocation });
+                        }
                     }
                 });
                 $(this).append($('<iframe class="plastic-iframe-frame" id="' + thisId + '_frame" src="about:blank" />'));

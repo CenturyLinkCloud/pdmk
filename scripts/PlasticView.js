@@ -88,6 +88,7 @@
                         var viewId = thisTree.$tree.attr('id');
                         var thisTreeRoot = view[name].dynatree("getRoot");
                         var prevEnable = thisTree.enableUpdate(false);
+                        var delayedExpands = [];
                         if ((rowObjects.length === 0) || (rowObjects[0].status === 'empty')) {
                             _PlasticBug(rowObjects, 4, 'comment');
                             if ((rowObjects.length) && (rowObjects[0].parentKey)) {
@@ -178,6 +179,10 @@
                                         ///if (!(parentnode.isExpanded())) { parentnode.expand(); };
                                     } else { ////if (rowObjects[0].status !== 'cached') { // Null node cached rowObjects cannot exist
                                         node = parentnode.addChild(baseRow);
+                                        if ((rowObjects[cntRow].firstChild !== null) && //->
+                                            (rowObjects[cntRow].firstChild === rowObjects[cntRow].lastChild)) {
+                                            delayedExpands[delayedExpands.length] = node;
+                                        }
                                         node.data.rowObject = rowObjects[cntRow];
                                     }
                                 }
@@ -200,6 +205,11 @@
                             }
                         }
                         thisTree.enableUpdate(prevEnable);
+                        if (delayedExpands.length) {
+                            $.each(delayedExpands, function(){
+                                this.expand();
+                            });
+                        }
                     //    $('.plastic-treenode-summary.plastic-unpainted:visible').each(function(){
                     //    ////$('.plastic-treenode-summary:visible').each(function(){
                     //        ////$(this).sparkline('html', $(this).data('sparkopts')).removeClass('plastic-unpainted');
@@ -318,28 +328,30 @@
                     $(this).outerHeight($(this).parent().height() - $(this).parent().children('ul:first').outerHeight());
                 });
                 $(this).on('initialize.plastic', function (e) {
-                    e.stopPropagation(); // Prevent this event bubbling to parents
-                    var fopts = ((this) && (this.plasticopts)) ? this.plasticopts : {};
-                    // Make dsname, datastore and namespace common for this "self" object (FindMe!!)
-                    var dsname = (fopts.datastore) ? fopts.datastore : null;
-                    var datastore = ((dsname) && (_PlasticRuntime.datastore[dsname])) //->
-                        ? _PlasticRuntime.datastore[dsname] : null; 
-                    var rowsRead = function() {
-                        self.rowsRead.apply(self, arguments);
-                        if ((self.length) && (self[0].plasticopts)) {
-                            if (self[0].plasticopts.autoExpand) {
-                                self.dynatree('getRoot').visit(function(node){
-                                    node.expand(true);
-                                });
+                    if (e.target === this) { // Direct events only
+                        e.stopPropagation(); // Prevent this event bubbling to parents
+                        var fopts = ((this) && (this.plasticopts)) ? this.plasticopts : {};
+                        // Make dsname, datastore and namespace common for this "self" object (FindMe!!)
+                        var dsname = (fopts.datastore) ? fopts.datastore : null;
+                        var datastore = ((dsname) && (_PlasticRuntime.datastore[dsname])) //->
+                            ? _PlasticRuntime.datastore[dsname] : null; 
+                        var rowsRead = function() {
+                            self.rowsRead.apply(self, arguments);
+                            if ((self.length) && (self[0].plasticopts)) {
+                                if (self[0].plasticopts.autoExpand) {
+                                    self.dynatree('getRoot').visit(function(node){
+                                        node.expand(true);
+                                    });
+                                }
                             }
+                        };
+                        if ((fopts) && (fopts.defaultTarget) && (_PlasticRuntime.inventory[fopts.defaultTarget]) && //->
+                            (_PlasticRuntime.inventory[fopts.defaultTarget].options) && //->
+                            (_PlasticRuntime.inventory[fopts.defaultTarget].options.isDefault)) {
+                            fopts._hasDefault = _PlasticRuntime.inventory[fopts.defaultTarget].options.isDefault;
                         }
-                    };
-                    if ((fopts) && (fopts.defaultTarget) && (_PlasticRuntime.inventory[fopts.defaultTarget]) && //->
-                        (_PlasticRuntime.inventory[fopts.defaultTarget].options) && //->
-                        (_PlasticRuntime.inventory[fopts.defaultTarget].options.isDefault)) {
-                        fopts._hasDefault = _PlasticRuntime.inventory[fopts.defaultTarget].options.isDefault;
+                        if (datastore) { datastore.readRows(null, null, rowsRead, fopts); };
                     }
-                    if (datastore) { datastore.readRows(null, null, rowsRead, fopts); };
                 });
                 $(this).addClass('plastic-scroll-container');
                 $(this).on('click', '.plastic-treenode-state.plastic-disabled', function(e){
@@ -842,63 +854,65 @@
                 //        }
 
                 $(this).on('initialize.plastic', function (e) {
-                    $(this).children('table:first').dataTable({
-                        processing: true
-                       ,serverSide: true
-                       ,ajax: this.PlasticAjax
-                       ,columnDefs: [
-                            {
-                                "class": 'plastic-list-flagbox'
-                               ,orderable: false
-                               ,render: function() {
-                                    var thisChecked = (/\[.*S.*\]/.test(arguments[0])) ? ' checked' : '';
-                                    return '<input class="plastic-view-list-selector" name="' + //->
-                                        thisId + '_select" type="' + thisType + '"' + thisChecked + '>';
-                                }
-                               ,targets: 0
-                            }
-                           ,{
-                                render: function(data, type, row, meta) {
-                                    var retVal = data;
-                                    if (typeof (retVal) === 'boolean') {
-                                        retVal = '<span class="plastic-checkable-icon ui-icon ui-icon-' + ((retVal) ? 'check' : 'blank') + '"></span>';
+                    if (e.target === this) { // Direct events only
+                        $(this).children('table:first').dataTable({
+                            processing: true
+                           ,serverSide: true
+                           ,ajax: this.PlasticAjax
+                           ,columnDefs: [
+                                {
+                                    "class": 'plastic-list-flagbox'
+                                   ,orderable: false
+                                   ,render: function() {
+                                        var thisChecked = (/\[.*S.*\]/.test(arguments[0])) ? ' checked' : '';
+                                        return '<input class="plastic-view-list-selector" name="' + //->
+                                            thisId + '_select" type="' + thisType + '"' + thisChecked + '>';
                                     }
-                                /*
-                                    if ((row.rowObject) && (row.rowObject.dirty)) {
-                                        if (meta.settings.aoColumns[meta.col].data) {
+                                   ,targets: 0
+                                }
+                               ,{
+                                    render: function(data, type, row, meta) {
+                                        var retVal = data;
+                                        if (typeof (retVal) === 'boolean') {
+                                            retVal = '<span class="plastic-checkable-icon ui-icon ui-icon-' + ((retVal) ? 'check' : 'blank') + '"></span>';
                                         }
+                                    /*
+                                        if ((row.rowObject) && (row.rowObject.dirty)) {
+                                            if (meta.settings.aoColumns[meta.col].data) {
+                                            }
+                                        }
+                                    */
+                                        return retVal;
                                     }
-                                */
-                                    return retVal;
+                                   ,targets: allColsButFlag
                                 }
-                               ,targets: allColsButFlag
-                            }
-                           ,{   "visible": false,  "targets": invisibleTargets }
-                        ]
-                       ,rowCallback: function(row, data) {
-                            if ((data) && (data.rowObject)) {
-                                if (data.rowObject.deleted) { $(row).addClass('plastic-deleted'); };
-                                if (data.rowObject.dirty) { $(row).addClass('plastic-dirty'); };
-                                if (datastore) {
-                                    var selected = datastore.option('selected');
-                                    // Target Deleted/ Dirty Columns (FindMe!!)
-                                    $(row).children('td').each(function(){
-                                    });
+                               ,{   "visible": false,  "targets": invisibleTargets }
+                            ]
+                           ,rowCallback: function(row, data) {
+                                if ((data) && (data.rowObject)) {
+                                    if (data.rowObject.deleted) { $(row).addClass('plastic-deleted'); };
+                                    if (data.rowObject.dirty) { $(row).addClass('plastic-dirty'); };
+                                    if (datastore) {
+                                        var selected = datastore.option('selected');
+                                        // Target Deleted/ Dirty Columns (FindMe!!)
+                                        $(row).children('td').each(function(){
+                                        });
+                                    }
                                 }
                             }
-                        }
-                       ,order: [ 1, 'asc' ]
-                       ,paging: false
-                       ,searching: false
-                       ,info: false
-                       ,scrollX: true
-                       ,scrollY: '100%'
-                       ,scrollCollapse: false
-                       ,deferRender: true
-                       ,dom: 'frtiS'
-                       ,columns: columns
-                    });
-                    $(this).find('.dataTables_scrollBody').addClass('plastic-scroll-container');
+                           ,order: [ 1, 'asc' ]
+                           ,paging: false
+                           ,searching: false
+                           ,info: false
+                           ,scrollX: true
+                           ,scrollY: '100%'
+                           ,scrollCollapse: false
+                           ,deferRender: true
+                           ,dom: 'frtiS'
+                           ,columns: columns
+                        });
+                        $(this).find('.dataTables_scrollBody').addClass('plastic-scroll-container');
+                    }
                 });
                 return $(this);
             }
@@ -918,10 +932,10 @@
             var thisTarget = self._findTarget(targetName);
             var namespace = ((viewargs) && (viewargs.length > 1) && (viewargs[1].namespace)) ? viewargs[1].namespace : 'default';
             _PlasticBug(thisTarget, 4, 'comment');
-            // See if Tests Are Required to Activate Row
+            // See if Tests Are Required to Allow Row Activation
             var canActivate = true;
-            if ((viewargs) && (viewargs.length > 1) && (viewargs[1].test)) {
-                var tests = viewargs[1].test;
+            if ((viewargs) && (viewargs.length > 1) && (viewargs[1].allowIf)) {
+                var tests = viewargs[1].allowIf;
                 for (var cntTest = 0; cntTest < tests.length; cntTest ++) {
                     canActivate = Plastic.Test.call(targetName, this.data.rowObject, tests[cntTest], viewargs[1]);
                     if (!(canActivate)) { break; }; // One false is enough

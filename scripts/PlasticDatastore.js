@@ -11,7 +11,7 @@
 / Support Contact: plastic@centurylink.com
 /
 / Created: 04 January, 2014
-/ Last Updated: 10 February, 2016
+/ Last Updated: 10 February, 2017
 /
 / VERSION: 1.0.0b
 /
@@ -70,6 +70,7 @@ function PlasticDatastore(name, fopts) {
     var _dirtyCount;
     var error = {};
     var sorted = {};
+    var flattened = {};
     //dirty['D63E5D17-1044-3DA0-B950-2B63B892D421'] = { dirty : true };
     var flags = {};
     var cacheSize = 0;
@@ -101,15 +102,18 @@ function PlasticDatastore(name, fopts) {
        ,delimiter: '/'
        ,trimDelimiter: false
        ,includeRoot: false
+       ,prettyNames: null
     };
     var views = { "default" : [] }; // Bound framework views
+    this.version = '1.0.0b1';
+    this.release = 'Public Beta [Epoxy]';
     this.option = function _PlasticDatastore_option(name, value, fopts) {
         var retVal;
         if (typeof (name) === 'string') {
             if (value === undefined) {
                 switch (name) {
                     case "securityContext":
-                        retVal = (opts[name] !== undefined) ? JSON.parse(opts[name]) : undefined;
+                        retVal = (name in opts) ? JSON.parse(opts[name]) : undefined;
                         break;
                     case "rowDefault":
                         if (opts[name] !== undefined) {
@@ -117,6 +121,9 @@ function PlasticDatastore(name, fopts) {
                         } else {
                             retVal = undefined;
                         }
+                        break;
+                    case "prettyNames":
+                        retVal = (name in opts) ? opts[name] : {};
                         break;
                     default:
                         retVal = (opts[name] !== undefined) ? opts[name] : undefined;
@@ -143,6 +150,7 @@ function PlasticDatastore(name, fopts) {
                                        ,next: null //->
                                        ,children: null //->
                                        ,firstChild: null //->
+                                       ,lastChild: null //->
                                        ,actions: null //->
                                        ,ancestorFlag: self._ancestorFlag //->
                                        ,parent: self._parent //->
@@ -179,6 +187,7 @@ function PlasticDatastore(name, fopts) {
                                        ,next: null //->
                                        ,children: null //->
                                        ,firstChild: null //->
+                                       ,lastChild: null //->
                                        ,actions: null //->
                                        ,ancestorFlag: self._ancestorFlag //->
                                        ,parent: self._parent //->
@@ -221,6 +230,7 @@ function PlasticDatastore(name, fopts) {
                                                ,next: null //->
                                                ,children: null //->
                                                ,firstChild: null //->
+                                               ,lastChild: null //->
                                                ,actions: null //->
                                                ,ancestorFlag: self._ancestorFlag //->
                                                ,parent: self._parent //->
@@ -361,6 +371,8 @@ function PlasticDatastore(name, fopts) {
                     case "includeRoot":
                         opts[name] = ((value === true) || (value === false)) ? value : false;
                         break;
+                    case "prettyNames":
+                        opts[name] = (typeof (value) === 'object') ? value : null;
                     default:
                         opts[name] = value;
                 }
@@ -387,17 +399,33 @@ function PlasticDatastore(name, fopts) {
         views[namespace][views[namespace].length] = arguments[0];
         _PlasticBug(arguments[0], 4, 'state');
     };
-    this.requestSecurityContextHandler = null;
-    this.requestSecurityContext = function _PlasticDatastore_requestSecurityContext(retFunction) {
+    this.authenticateHandler = null;
+    this.authenticate = function _PlasticDatastore_authenticate(name, password, retFunction, fopts) {
         var thisReturnFunction = function(context){
             if ((retFunction) && (typeof (retFunction) === 'function')) {
                 retFunction.call(this, context);
             } else {
-                _PlasticBug('WARN: retFunction not properly defined for requestSecurityContext', 2);
+                _PlasticBug('WARN: retFunction not properly defined for authenticate', 2);
             }
         };
-        if ((this.requestSecurityContextHandler) && (typeof (this.requestSecurityContextHandler) === 'function')) {
-            this.requestSecurityContextHandler.call(this, thisReturnFunction);
+        if ((this.authenicateHandler) && (typeof (this.authenicateHandler) === 'function')) {
+            this.authenicateHandler.call(this, thisReturnFunction);
+        } else {
+            thisReturnFunction.call(this, {});
+        }
+    };
+    this.securityContextHandler = null;
+    this.securityContext = function _PlasticDatastore_securityContext(retFunction) {
+        var thisReturnFunction = function(context){
+            if ((retFunction) && (typeof (retFunction) === 'function')) {
+                self.option.call(this, 'securityContext', context);
+                retFunction.call(this, context);
+            } else {
+                _PlasticBug('WARN: retFunction not properly defined for securityContext', 2);
+            }
+        };
+        if ((this.securityContextHandler) && (typeof (this.securityContextHandler) === 'function')) {
+            this.securityContextHandler.call(this, thisReturnFunction);
         } else {
             thisReturnFunction.call(this, {});
         }
@@ -413,7 +441,7 @@ function PlasticDatastore(name, fopts) {
             "key" : thisKey, "parentKey" : thisParentkey, "title" : undefined, "qualifiedTitle" : undefined, "tooltip" : undefined, //->
             "dirty" : null, "error" : null, "deleted" : null, "selected": null, "isolated" : true, "children" : null, //->
             "ancestorFlag" : this._ancestorFlag, "parent" : this._parent, "siblings" : this._siblings, //->
-            "prev" : undefined, "next" : undefined, "firstChild" : undefined, //->
+            "prev" : undefined, "next" : undefined, "firstChild" : undefined, "lastChild" : undefined, //->
             "actions" : this._actions, "sortIndex" : {}, "attributes" : {} };
         if (defaults) {
             var thisDirty = null;
@@ -463,8 +491,8 @@ function PlasticDatastore(name, fopts) {
                             ? opts.rootAnchor : rootNodeKey //->
                         : key //->
                     : (key === null) //->
-                        ? (this.readCache(parentkey).firstChild) //->
-                            ? this.readCache(parentkey).firstChild //->
+                        ? (this.readCache(parentkey, fopts).firstChild) //->
+                            ? this.readCache(parentkey, fopts).firstChild //->
                             : null //->
                         : key;
             var cached = (tryCache) ? this.readCache(tryCache, fopts) : undefined;
@@ -476,48 +504,53 @@ function PlasticDatastore(name, fopts) {
                 }
             } else {
                 key = ((key === null) && (tryCache)) ? tryCache : key;
-                var thisReadRowContext = function(context) {
-                    if (this.readRowHandler) {
-                        this.readRowHandler.call(datastore, parentkey, key, function(rowObjects, fopts) {
-                            _PlasticBug('readRowHandler(key, rowObjects); called', 4, 'function');
-                            var thisKey = key;
-                            if ((rowObjects.length === 0) || (rowObjects[0].status === 'empty')) {
-                                _PlasticBug('Calling retFunction', 4, 'call');
-                                retFunction([ jQuery.extend(rowObjects[0], { "id" : self.nextSequence() }) ], fopts);
-                                _PlasticBug('Called retFunction', 4, 'call');
-                            } else if ((rowObjects.length === 0) || (rowObjects[0].status === 'error')) {
-                                // Flag row with error (FindMe!!)
-                            } else {
-                                // Special Case - Prime The Datastore
-                                if (thisKey === null) { thisKey = rowObjects[1].key; };
-                                if ((parentkey === null) && (rootNodeKey === null)) { rootNodeKey = thisKey; };
-                                for (var cntRows = 1; cntRows < rowObjects.length; cntRows++) {
-                                    self.cacheRow(rowObjects[cntRows].key, $.extend( //->
-                                        self.getGenericRowObject(parentkey, rowObjects[cntRows].key), //->
-                                        rowObjects[cntRows]), fopts);
+                var thisReadRowContext = undefined; // Required for self references
+                thisReadRowContext = function(context) {
+                    if (context === _noSecurityContext) {
+                        self.securityContext.call(this, thisReadRowContext);
+                    } else {
+                        if (this.readRowHandler) {
+                            this.readRowHandler.call(datastore, parentkey, key, function(rowObjects, fopts) {
+                                _PlasticBug('readRowHandler(key, rowObjects); called', 4, 'function');
+                                var thisKey = key;
+                                if ((rowObjects.length === 0) || (rowObjects[0].status === 'empty')) {
+                                    _PlasticBug('Calling retFunction', 4, 'call');
+                                    retFunction([ jQuery.extend(rowObjects[0], { "id" : self.nextSequence() }) ], fopts);
+                                    _PlasticBug('Called retFunction', 4, 'call');
+                                } else if ((rowObjects.length === 0) || (rowObjects[0].status === 'error')) {
+                                    // Flag row with error (FindMe!!)
+                                } else {
+                                    // Special Case - Prime The Datastore
+                                    if (thisKey === null) { thisKey = rowObjects[1].key; };
+                                    if ((parentkey === null) && (rootNodeKey === null)) { rootNodeKey = thisKey; };
+                                    for (var cntRows = 1; cntRows < rowObjects.length; cntRows++) {
+                                        self.cacheRow(rowObjects[cntRows].key, $.extend( //->
+                                            self.getGenericRowObject(parentkey, rowObjects[cntRows].key), //->
+                                            rowObjects[cntRows]), fopts);
+                                    }
+                                    _PlasticBug('Calling retFunction', 4, 'call');
+                                    //var cachedRow = self.readCache(thisKey, fopts);
+                                    //if (cachedRow === null) {
+                                    //    retFunction([ jQuery.extend({}, fopts, { "status" : "empty", "id" : self.nextSequence() })], fopts);
+                                    //} else {
+                                        retFunction(self._safeRowReturn( //->
+                                            [ jQuery.extend({}, fopts, { "status" : "live", "id" : self.nextSequence() }), //->
+                                                self.readCache(thisKey, fopts) ]), fopts);
+                                    //}
+                                    _PlasticBug('Called retFunction', 4, 'call');
                                 }
-                                _PlasticBug('Calling retFunction', 4, 'call');
-                                //var cachedRow = self.readCache(thisKey, fopts);
-                                //if (cachedRow === null) {
-                                //    retFunction([ jQuery.extend({}, fopts, { "status" : "empty", "id" : self.nextSequence() })], fopts);
-                                //} else {
-                                    retFunction(self._safeRowReturn( //->
-                                        [ jQuery.extend({}, fopts, { "status" : "live", "id" : self.nextSequence() }), //->
-                                            self.readCache(thisKey, fopts) ]), fopts);
-                                //}
-                                _PlasticBug('Called retFunction', 4, 'call');
-                            }
-                        }, fopts);
+                            }, fopts);
+                        }
                     }
-                }
-                if (opts.securityContext === null) {
-                    self.requestSecurityContext.call(this, function(context){
-                        self.option.call(this, 'securityContext', context);
-                        thisReadRowContext.call(this, context);
-                    });
-                } else {
+                };
+                ///if (opts.securityContext === _noSecurityContext) {
+                ///    self.securityContext.call(this, function(context){
+                ///        self.option.call(this, 'securityContext', context);
+                ///        thisReadRowContext.call(this, context);
+                ///    });
+                ///} else {
                     thisReadRowContext.call(this, opts.securityContext);
-                }
+                ///}
             }
         } else {
             _PlasticBug('WARN: invalid key provided to readRow', 2);
@@ -851,6 +884,100 @@ function PlasticDatastore(name, fopts) {
             }
         } else if (update[0].status === 'selectionupdate') { // Update Selection Array (Object)
             if (update.length > 1) {
+                // Check for unfulfilled elements and manage error conditions
+                var thisUF = {};
+                $('.Plastic').plasticKeyFilter(key).each(function(){
+                    thisUF[$(this).attr('id')] += 1;
+                });
+                for (var thisItem in _PlasticRuntime.inventory) {
+                    if ((thisItem in thisUF) && ('options' in _PlasticRuntime.inventory[thisItem])) {
+                        if ('fulfill' in _PlasticRuntime.inventory[thisItem].options) {
+                            for (var thisCheck in _PlasticRuntime.inventory[thisItem].options.fulfill) {
+                                var thisWasFulfilled = false;
+                                var thisFulfill = _PlasticRuntime.inventory[thisItem].options.fulfill[thisCheck];
+                                var thisTryVal = ((update) && (update.length > 1) && (thisCheck in update[1])) //->
+                                    ? update[1][thisCheck] //->
+                                    : $('#' + thisItem + '_' + thisCheck).val();
+                                if (thisFulfill instanceof Array) { // Simple Fulfill Array
+                                    for (var cntFulfill = 0; cntFulfill < thisFulfill.length; cntFulfill ++) {
+                                        if (thisFulfill[cntFulfill] === thisTryVal) {
+                                            thisWasFulfilled = true;
+                                            break;
+                                        }
+                                    }
+                                    if (thisWasFulfilled) {
+//cl('IS_FULFILLED: ' + thisCheck);
+                                        delete(rowError[thisCheck]);
+                                    } else {
+//cl('IS_NOT_FULFILLED: ' + thisCheck);
+                                        var thisLabel = ((thisItemOpts) && ('prettyNames' in thisItemOpts) && //->
+                                            (thisCheck in thisItemOpts.prettyNames)) //->
+                                            ? thisItemOpts.prettyNames[thisCheck] //->
+                                            : (thisCheck in datastore.option('prettyNames')) //->
+                                                ? datastore.option('prettyNames')[thisCheck] //->
+                                                : thisCheck;
+                                        rowError[thisCheck] = '<span class="plastic-system-feedback-title">Validation Error:</span>' + //->
+                                            'Specified [' + thisLabel + '] \'' + thisTryVal + '\' not an allowed option, ' + //->
+                                            'please select another from its dropdown list.';
+                                    }
+                                } else if ((!(thisFulfill instanceof Array)) && ($('#' + thisFulfill).length)) {
+                                    var thisItemOpts = $('#' + thisItem)[0].plasticopts;
+                                    var thisFFopts = $('#' + thisFulfill)[0].plasticopts;
+                                    var thisSelected = ((thisFFopts) && (thisFFopts.selected)) //->
+                                        ? thisFFopts.selected : null;
+                                    var blend1 = (thisSelected) //-> // Gather Available Fulfill Items
+                                        ? ((rowObject[1].attributes) && (thisSelected in rowObject[1].attributes)) //->
+                                            ? rowObject[1].attributes[thisSelected] //->
+                                            : (thisSelected in rowObject[1]) //->
+                                                ? rowObject[1][thisSelected] : {} //->
+                                        : {};
+                                    var blend2 = (rowDirty) //-> // Gather Dirty Fulfill Items
+                                        ? ((rowDirty.attributes) && (thisSelected in rowDirty.attributes)) //->
+                                            ? rowDirty.attributes[thisSelected] //->
+                                            : (thisSelected in rowDirty) //->
+                                                ? rowDirty[thisSelected] : {} //->
+                                        : {};
+                                    var blend3 = ((update) && (update.length > 1)) //-> // Gather Updated Fulfill Items
+                                        ? (thisSelected in update[1]) //->
+                                            ? update[1][thisSelected] : {} //->
+                                        : {};
+                                    var blended = $.extend({}, blend1, blend2, blend3);
+                                    for (var thisFFtry in blended) {
+                                        if (blended[thisFFtry] === thisTryVal) {
+                                            thisWasFulfilled = true;
+                                            break;
+                                        }
+                                    } 
+                                    if (thisWasFulfilled) {
+//cl('IS_FULFILLED: ' + thisCheck);
+                                        delete(rowError[thisCheck]);
+                                    } else {
+//cl('IS_NOT_FULFILLED: ' + thisCheck);
+                                        var thisLabel = ((thisItemOpts) && ('prettyNames' in thisItemOpts) && //->
+                                            (thisCheck in thisItemOpts.prettyNames)) //->
+                                            ? thisItemOpts.prettyNames[thisCheck] //->
+                                            : (thisCheck in datastore.option('prettyNames')) //->
+                                                ? datastore.option('prettyNames')[thisCheck] //->
+                                                : thisCheck;
+                                        var thisFFlabel = ((thisItemOpts) && ('prettyNames' in thisItemOpts) && //->
+                                            (thisFulfill in thisItemOpts.prettyNames)) //->
+                                            ? thisItemOpts.prettyNames[thisFulfill] //->
+                                            : (thisFulfill in datastore.option('prettyNames')) //->
+                                                ? datastore.option('prettyNames')[thisFulfill] //->
+                                                : thisFulfill;
+                                        var thisFFtitle = (thisFFopts.filterTitle === undefined) //->
+                                            ? 'Selected: ' + thisFFlabel : thisFFopts.filterTitle;
+                                        rowError[thisCheck] = '<span class="plastic-system-feedback-title">Validation Error:</span>' + //->
+                                            'Specified [' + thisLabel + '] \'' + thisTryVal + '\' not found in the ' + //->
+                                            '<nobr>[' + thisFFtitle + ']</nobr> list, please modify your selection.';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                // $('.plastic-stack-active').each(function(){cl($(this).data())});
+                // $('.Plastic').plasticKeyFilter(key).each(function(){cl($(this).attr('id'))})
                 for (var thisAttr in update[1]) {
                 }
             }
@@ -1046,6 +1173,50 @@ function PlasticDatastore(name, fopts) {
         delete (dirtyKey.attributes);
         delete (dirtyKey.key);
         var sortedKey = ((sorted[namespace]) && (sorted[namespace][key])) ? sorted[namespace][key] : {};
+        if ((fopts) && (fopts.flatten)) { // Provide "flattened" view of datastore
+//            if (!(namespace in flattened)) { flattened[namespace] = {}; };
+//            if (!(key in flattened[namespace])) {
+//                flattened[namespace][key] = {
+//                    parentKey: (parentKey in cache[key]) ? cache[key].parentKey : null
+//                };
+//            }
+            sortedKey = {
+//                next: (sortedKey.next) //->
+//                    ? sortedKey.next
+//                    : (sortedKey.firstChild) //->
+//                        ? sortedKey.firstChild //->
+//                        : (cache[key].parentKey) //->
+//                            ? ((sorted[namespace]) && (sorted[namespace][cache[key].parentKey])) //->
+//                                ? (sorted[namespace][cache[key].parentKey].next) //->
+//                                    ? sorted[namespace][cache[key].parentKey].next //->
+//                                    : (sorted[namespace][cache[key].parentKey].firstChild) //->
+//                                        ? sorted[namespace][cache[key].parentKey].firstChild //->
+//                                        : null //->
+//                                : null //->
+//                            : null //->
+                next: (sortedKey.firstChild) //->
+                    ? sortedKey.firstChild
+                    : (sortedKey.next) //->
+                        ? sortedKey.next //->
+                        : ((cache[key]) && ('parentKey' in cache[key])) //->
+                            ? ((sorted[namespace]) && (sorted[namespace][cache[key].parentKey])) //->
+                                ? (sorted[namespace][cache[key].parentKey].next) //->
+                                    ? sorted[namespace][cache[key].parentKey].next //->
+                                    : null //->
+                                : null //->
+                            : null //->
+               ,prev: (sortedKey.prev) //->
+                    ? ((sorted[namespace]) && (sorted[namespace][sortedKey.prev])) //->
+                        ? (sorted[namespace][sortedKey.prev].lastChild) //->
+                            ? sorted[namespace][sortedKey.prev].lastChild //->
+                            : sortedKey.prev //->
+                        : sortedKey.prev //->
+                    : ((cache[key]) && ('parentKey' in cache[key])) //->
+                        ? cache[key].parentKey //->
+                        : null //->
+               ,parentKey: this.root(), firstChild: null, lastChild: null //->
+            };
+        }
         var retVal = (cache[key]) //->
             ? jQuery.extend({}, cache[key], dirtyKey, titled, sortedKey) //->
             : ((fopts) && (fopts.safe)) ? {} : null;
@@ -1148,10 +1319,26 @@ function PlasticDatastore(name, fopts) {
         });
         //this._lruBottom(key);
     };
-    this._actions = function _PlasticDatastore__actions(flag, path, against) {
+    this._actions = function _PlasticDatastore__actions(rowObject, path, against) {
         var retVal = {};
-        if ((path) && (/^(parentKey|key|qualifiedTitle|tooltip|deleted|dirty|disabled|isolated|error|hidden|isolated|next|prev)$/.test(path))) {
-            retVal['create'] = retVal['update'] = retVal['delete'] = false;
+        if (path) {
+            if (/^@/.test(path)) { // Test Group Selection
+                var isdeleted = path.replace(/^@/, '') + '#deleted';
+                if (rowObject) {
+                    if ((rowObject.deleted) || //->
+                        ((rowObject.attributes) && (rowObject.attributes[isdeleted]) && //->
+                            (rowObject.attributes[isdeleted][against]))) {
+                        retVal['delete'] = false;
+                    }
+                }
+            } else {
+                if ((rowObject) && (rowObject.deleted)) {
+                    retVal['delete'] = false;
+                }
+            }
+            // Check other CRUD values (FindMe!!)
+            // && (/^(parentKey|key|qualifiedTitle|tooltip|deleted|dirty|disabled|isolated|error|hidden|isolated|next|prev)$/.test(path))) {
+            //retVal['create'] = retVal['update'] = retVal['delete'] = false;
         }
         return retVal;
     };

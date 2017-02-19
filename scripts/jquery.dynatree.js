@@ -119,6 +119,7 @@ var DTNodeStatus_Ok      = 0;
 // Start of local namespace
 (function($) {
 
+var _keyToNode = {};
 /*************************************************************************
  *	Common tool functions.
  */
@@ -211,6 +212,7 @@ DynaTreeNode.prototype = {
 		this.bExpanded = false;
 		this.bSelected = false;
 
+                _keyToNode[data.key] = this;
 	},
 
 	toString: function() {
@@ -1487,6 +1489,11 @@ DynaTreeNode.prototype = {
 					$("li", $(this.ul)).remove(); // issue 231
 				}
 //				delete tn;  JSLint complained
+
+				if ((tn.data) && (tn.data.key)) {
+					delete (_keyToNode[tn.data.key]);
+				}
+
 			}
 			// Set to 'null' which is interpreted as 'not yet loaded' for lazy
 			// nodes
@@ -2431,19 +2438,21 @@ DynaTree.prototype = {
 	getNodeByKey: function(key) {
 		// Search the DOM by element ID (assuming this is faster than traversing all nodes).
 		// $("#...") has problems, if the key contains '.', so we use getElementById()
-		var el = document.getElementById(this.options.idPrefix + key);
-		if( el ){
-			return el.dtnode ? el.dtnode : null;
+		if (this.options.generateIds) { // Don't bother looking if not available
+			var el = document.getElementById(this.options.idPrefix + key);
+			if( el ){
+				return el.dtnode ? el.dtnode : null;
+			}
 		}
 		// Not found in the DOM, but still may be in an unrendered part of tree
-		var match = null;
-		this.visit(function(node){
-//			window.console.log("%s", node);
-			if(node.data.key === key) {
-				match = node;
-				return false;
-			}
-		}, true);
+		var match = (_keyToNode[key] !== undefined) ? _keyToNode[key] : null;
+//		this.visit(function(node){
+////			window.console.log("%s", node);
+//			if(node.data.key === key) {
+//				match = node;
+//				return false;
+//			}
+//		}, true);
 		return match;
 	},
 
