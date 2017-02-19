@@ -30,4 +30,6 @@ These blocks fit into the following 5 categories:
 >   - data which can easily be formed, molded, pliably adapted and manipulated to varying conditions
 >
 
-Documentation: https://ioneyez.github.io/pdmk/helpcontent.html
+Documentation: http://www.thepdmk.com/pdmk/helpcontent.html
+
+> SEE LICENSE-MIT CONTRIBUTION-NOTICE AND CREDITS FOR LEGAL DETAILS
