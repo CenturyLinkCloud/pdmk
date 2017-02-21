@@ -204,10 +204,10 @@ Plastic.RegisterDatastore({
                         'Once you get the hand of [pdmk] in the JSFiddle playground, simply download [pdmk] to your ' + //->
                         'project\'s site and add the following code to activate all that is plastic.<br><br>' + //->
                         '<pre class="prettyprint linenums">\n' + //->
-                        '&lt;script src="https://ioneyez.github.io/pdmk/scripts/pdmk-min.js" type="text/javascript"&gt;&lt;/script&gt;\n' + //->
-                        '&lt;link  href="https://ioneyez.github.io/pdmk/style/pdmk-min.css" rel="stylesheet" type="text/css"&gt;\n\n' + //->
+                        '&lt;script src="https://cdn.rawgit.com/ioneyez/thepdmk/1.0.0b/cdn/scripts/pdmk-min.js" type="text/javascript"&gt;&lt;/script&gt;\n' + //->
+                        '&lt;link  href="https://cdn.rawgit.com/ioneyez/thepdmk/1.0.0b/cdn/style/pdmk-min.css" rel="stylesheet" type="text/css"&gt;\n\n' + //->
                         '&lt;!-- Optional Demo Datastores --&gt;\n' + //->
-                        '&lt;script src="https://ioneyez.github.io/pdmk/scripts/PlasticDatastoreHelp.js" type="text/javascript"&gt;&lt;/script&gt;\n' + //->
+                        '&lt;script src="https://cdn.rawgit.com/ioneyez/thepdmk/1.0.0b/cdn/scripts/PlasticDatastoreHelp.js" type="text/javascript"&gt;&lt;/script&gt;\n' + //->
                         '</pre><br>' + //->
                         'To help get you on your way, take a quick look at our video tutorial:<br><br>' + //->
                         '<div class="pdmk-flowplayer" ' + //->
@@ -1314,6 +1314,71 @@ Plastic.RegisterDatastore({
                 }
             ]
            ,{
+                title: 'Downloads', tooltip: 'Download [pdmk] or [pdmk] "Monomer" Projects', type: 'downloads', key: 'downloads'
+               ,attributes: {
+                    preinlinehelp: '<div style="font-style:normal;">' + //->
+                        '<div class="plastic-form-title" style="margin-top:0px;">' + //->
+                        'Downloads [Plastic Components]</div>' + //->
+                        'This following [pdmk] "Monomers" are available for download as well as the latest [pdmk] release.<br><br>' + //->
+                        '<ul><li><span activate="getpdmk">[pdmk] (1.0.0b)</span>:</li>Latest [pdmk] package (Hosting without CDN)' + //->
+                        '<li><span activate="getsfrs">SFRS (alpha)</span>:</li>Single File RESTful Service' + //->
+                        '</ul></div>' + //->
+                        '<p>NOTE: You can use the [pdmk] CDN service without downloading [pdmk].  Check out the ' + //->
+                        '<span activate="start">Getting Started</span> and <span activate="examples">JSFiddle Examples</span> ' + //->
+                        'pages for more details.</p>'
+                }
+            }
+           ,[
+                {
+                    title: 'Version 1.0.0b [Epoxy]', tooltip: 'Version 1.0.0b - "Epoxy"', type: 'getpdmk', key: 'getpdmk'
+                   ,attributes: {
+                        preinlinehelp: '<div style="font-style:normal;">' + //->
+                            '<div class="plastic-form-title" style="margin-top:0px;">' + //->
+                            'Version 1.0.0b - "Epoxy"</div>' + //->
+                            '<div style="text-align:right;"><span activate="downloads">&lt;&lt; Back to Downloads</span></div>' + //->
+                            'Below is the latest [pdmk] for download.  Please note this download is not required if your ' + //->
+                            'environment allows for a public Content Delivery Network (CDN) to provide access to [pdmk]. ' + //->
+                            'If you haven\'t already, please visit our <span activate="start">Getting Started</span> ' + //->
+                            'page for more details.<br><br><br>' + //->
+                            '<a style="padding:10px;color:#197771;font-size:20px;font-weight:bold;border-radius:5px;' + //->
+                            '    box-shadow:2px 2px 8px 4px #6699aa;cursor:pointer;text-decoration:none;' + //->
+                            '    background-color:#4fcfaf;border:solid #197771 2px;" title="1.0.0b &quot;Epoxy&quot;"' + //->
+                            '    href="releases/pdmk-1.0.0b.zip">Download [pdmk] 1.0.0b "Epoxy"</a>' + //->
+                            '</div>'
+                    }
+                }
+               ,{
+                    title: 'SFRS (alpha)', tooltip: 'Single File RESTful Service (alpha)', type: 'getsfrs', key: 'getsfrs'
+                   ,attributes: {
+                        preinlinehelp: '<div style="font-style:normal;">' + //->
+                            '<div class="plastic-form-title" style="margin-top:0px;">' + //->
+                            'Single File RESTful Service 0.8.5a (alpha)</div>' + //->
+                            '<div style="text-align:right;"><span activate="downloads">&lt;&lt; Back to Downloads</span></div>' + //->
+                            'Below is our 0.8.5a release of SFRS.  Please note this download is currently in an "alpha" state ' + //->
+                            'and not ready for production.  Some features may be incomplete or completely unimplemented and ' + //->
+                            'this download should be considered "experimental" at this stage of development.  In fact, this ' + //->
+                            'download may not actually function for you in any meaningful way at all.<br><br>' + //->
+                            'Furthermore, the only documentation for this project is embedded within the download inline ' + //->
+                            'within the code.<br><br>' + //->
+                            '<code><font size="-1">' + //->
+                            'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n' + //->
+                            'IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n' + //->
+                            'FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE\n' + //->
+                            'AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n' + //->
+                            'LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n' + //->
+                            'OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN\n' + //->
+                            'THE SOFTWARE.\n' + //->
+                            '</code></font><br><br>' + //->
+                            'Contact plastic at centurylink dot com with questions regarding this [pdmk] monomer.<br><br><br>' + //->
+                            '<a style="padding:10px;color:#197771;font-size:20px;font-weight:bold;border-radius:5px;' + //->
+                            '    box-shadow:2px 2px 8px 4px #6699aa;cursor:pointer;text-decoration:none;' + //->
+                            '    background-color:#4fcfaf;border:solid #197771 2px;" title="1.0.0b &quot;Epoxy&quot;"' + //->
+                            '    href="releases/sfrs-0.8.8a.zip">Download SFRS 0.8.8a (alpha)</a>' + //->
+                            '</div>'
+                    }
+                }
+            ]
+           ,{
                 title: 'LICENSE', tooltip: 'License [MIT]', type: 'license', key: 'license'
                ,attributes: {
                     preinlinehelp: '<div style="font-style:normal;">' + //->
@@ -1402,7 +1467,7 @@ Plastic.RegisterDatastore({
                         '    Chief End User Integrator - Dean Ballew &lt;dean.ballew@centurylink.com&gt;\n\n' + //->
                         '  Official [pdmk] Code Maintainers -\n\n' + //->
                         '    Chief Software Architect - John Woodworth &lt;john.woodworth@centurylink.com&gt;\n' + //->
-                        '    Chief End User Integrator - Dean Ballew &lt;dean.ballew@centurylink.com&gt;\n\n' + //->
+                        '    Chief End User Integrator - Dean Ballew &lt;dean.ballew@centurylink.com&gt;\n' + //->
                         '</pre>\n' + //->
                         '</div>\n'
                 }
