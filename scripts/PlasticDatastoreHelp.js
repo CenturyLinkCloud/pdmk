@@ -12,7 +12,7 @@
 / Support Contact: plastic@centurylink.com
 /
 / Created: 04 January, 2014
-/ Last Updated: 10 February, 2016
+/ Last Updated: 10 February, 2017
 /
 / VERSION: 1.0.0b
 /
@@ -1362,7 +1362,8 @@ Plastic.RegisterDatastore({
                         '    jQuery DataTables - http://www.datatables.net/ [BSD License]\n' + //->
                         '    jQuery Sparkline - http://omnipotent.net/jquery.sparkline/ [New BSD License] \n' + //->
                         '    QUnit - http://qunitjs.com/ [MIT License]\n' + //->
-                        '    BigInt - http://leemon.com/crypto/BigInt.html [Public Domain]\n\n' + //->
+                        '    BigInt - http://leemon.com/crypto/BigInt.html [Public Domain]\n' + //->
+                        '    jsSHA - https://github.com/Caligatio/jsSHA/ [Copyright Attribution]\n\n' + //->
                         '  Not-Plastic -\n\n' + //->
                         '    google-code-prettify - https://code.google.com/p/google-code-prettify/ [Apache License 2.0]\n\n\n' + //->
                         'Core Software Architecture and Plastic Contributors [pdmk]\n\n' + //->

@@ -12,7 +12,7 @@
 / Support Contact: plastic@centurylink.com
 /
 / Created: 04 January, 2014
-/ Last Updated: 10 February, 2016
+/ Last Updated: 10 February, 2017
 /
 / VERSION: 1.0.0b
 /
@@ -67,7 +67,7 @@ $(document).ready(function(){
         $('div.pdmk-flowplayer').flowplayer().removeClass('pdmk-flowplayer');
     });
     $('body').on('show.plastic', '#LicenseDialog', function(){ // Envoke Logo Animation
-        $('img[src="pdmkanim3o.gif"]', this).attr('src', 'about:blank').attr('src', 'pdmkanim3o.gif');
+        $('img[src="cust/images/pdmkanim3o.gif"]', this).attr('src', 'about:blank').attr('src', 'cust/images/pdmkanim3o.gif');
     });
 });
 
@@ -301,7 +301,7 @@ Plastic.RegisterPlaybook({
                                                     title: ''
                                                    ,help: {
                                                         _inlinepre: '%{preinlinehelp}'
-                                                       ,_inline: '%{inlinehelp}<br><center><img src="pdmkanim3o.gif" style="width:409px;height:230px;"></center>'
+                                                       ,_inline: '%{inlinehelp}<br><center><img src="cust/images/pdmkanim3o.gif" style="width:409px;height:230px;"></center>'
                                                     }
                                                 }
                                             }
